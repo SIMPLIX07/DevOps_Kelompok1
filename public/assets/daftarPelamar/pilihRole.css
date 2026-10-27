@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+:root {
+    --background-start: #1FACA2;
+    --background-end: #000E3A;
+    --card-bg-initial: rgba(255, 255, 255, 0.07);
+    --card-border-initial: rgba(255, 255, 255, 0.45);
+    --card-bg-hover: #FFFFFF;
+    --text-color-initial: #FFFFFF;
+    --text-color-hover: #333333;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+}
+
+body {
+    background: linear-gradient(105deg, var(--background-start), var(--background-end));
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    height: 100vh;
+    padding-top: 80px;
+    color: var(--text-color-initial);
+}
+
+/* --- Container halaman --- */
+.registration-page {
+    text-align: center;
+}
+
+.registration-page h1 {
+    font-size: 46px;           /* diperbesar agar mirip desain */
+    font-weight: 700;
+    margin-bottom: 90px;       /* diperluas supaya spasi lebih mirip */
+}
+
+/* --- Card container --- */
+.card-container {
+    display: flex;
+    gap: 95px;                 /* diperbesar biar mirip jarak desain */
+}
+
+/* --- Role Card --- */
+.role-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    text-align: left;
+
+    width: 320px;              /* card sedikit diperbesar */
+    padding: 40px 35px 50px;   /* padding diperbesar */
+    height: 360px;             /* tinggi diperbesar agar proporsional */
+
+    border-radius: 20px;       /* sedikit lebih bulat */
+    text-decoration: none;
+
+    background: var(--card-bg-initial);
+    border: 1px solid var(--card-border-initial);
+    transition: all 0.3s ease-in-out;
+}
+
+.role-card h2 {
+    font-size: 26px;           /* dari 22 -> 26px (lebih mirip desain pertama) */
+    font-weight: 600;
+    margin-top: 20px;          /* teks turun sedikit */
+    margin-bottom: 10px;
+    color: var(--text-color-initial);
+}
+
+.role-card p {
+    font-size: 17px;           /* dari 14 -> 17px */
+    line-height: 1.5;          /* text lebih rapi */
+    color: var(--text-color-initial);
+}
+
+/* Icon */
+.icon-wrapper {
+    width: 90px;               /* sebelumnya 70px, sekarang lebih besar */
+    height: 90px;
+    position: relative;
+    margin-bottom: 30px;       /* sedikit lebih jauh dari title */
+}
+
+.icon-wrapper img {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    transition: opacity 0.3s ease-in-out;
+}
+
+.icon-hover {
+    opacity: 0;
+}
+
+/* Hover */
+.role-card:hover {
+    background: var(--card-bg-hover);
+    border-color: #fff;
+    transform: translateY(-4px);
+}
+
+.role-card:hover h2,
+.role-card:hover p {
+    color: var(--text-color-hover);
+}
+
+.role-card:hover .icon-default {
+    opacity: 0;
+}
+
+.role-card:hover .icon-hover {
+    opacity: 1;
+}

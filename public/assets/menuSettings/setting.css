@@ -1,0 +1,72 @@
+/* Sidebar Tetap Sama */
+.cstm-sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #1FACA2, #000E3A);
+    flex-shrink: 0;
+}
+
+.cstm-nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 12px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+}
+
+.cstm-nav-link.active {
+    color: #000E3A !important;
+    background-color: white !important;
+    font-weight: 600;
+}
+
+/* KONTEN UTAMA */
+.cstm-field-group .form-label {
+    margin-bottom: 8px;
+    color: #333;
+}
+
+/* Kolom Display Abu-abu (Read-only) */
+.cstm-display-input {
+    border: 1px solid #ced4da;
+    padding: 10px 15px;
+    border-radius: 6px;
+    background-color: #f1f1f1 !important; /* Abu-abu seperti setting perusahaan */
+    color: #495057;
+    cursor: default;
+    font-weight: 500;
+}
+
+.cstm-avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e0e0e0;
+    overflow: hidden;
+}
+
+.cstm-edit-icon {
+    width: 22px;
+    height: 22px;
+}
+
+.cstm-divider {
+    border-top: 1px solid #e0e0e0;
+    opacity: 1;
+}
+
+.cstm-link-keluar {
+    font-size: 16px;
+    text-decoration: none;
+    transition: 0.2s;
+}
+
+.cstm-link-keluar:hover {
+    color: #b02a37 !important;
+}
+.cstm-sidebar .nav-link:hover,
+.cstm-sidebar .nav-link:focus {
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}

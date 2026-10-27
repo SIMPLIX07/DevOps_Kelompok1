@@ -1,0 +1,140 @@
+* {
+    box-sizing: border-box;
+    font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    background: #ffffff;
+    margin: 0;
+    padding: 0;
+}
+
+/* Wrapper agar tidak full layar */
+.form-wrapper {
+    padding: 40px 20px;
+}
+
+/* Container utama */
+.form-container {
+    max-width: 860px;              /* BATAS LEBAR */
+    margin: 0 auto;                /* CENTER */
+    padding: 40px 36px;            /* PADDING KIRI KANAN */
+    background: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+h4 {
+    margin: 32px 0 12px;
+    font-weight: 600;
+}
+
+/* Form element */
+label {
+    font-size: 14px;
+    display: block;
+    margin-top: 16px;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 10px 12px;
+    margin-top: 6px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background-color: #ffffff;
+}
+
+textarea {
+    min-height: 90px;
+    resize: vertical;
+}
+
+/* Grid */
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+/* Preview gambar */
+.preview {
+    margin-top: 14px;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.preview img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+}
+
+/* Button */
+.form-actions {
+    margin-top: 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 12px 24px;
+    background: #f1f4f6;
+    color: #43474c;
+    border: 1px solid #c3c7cd;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.btn-back:hover {
+    background: #e5e9eb;
+    border-color: #9ea4ab;
+}
+
+.btn-submit {
+    background: #4aa89c;
+    color: white;
+    padding: 12px 34px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.btn-submit:hover {
+    background: #3a8f84;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+    .form-container {
+        padding: 28px 20px;
+    }
+
+    .grid-3,
+    .grid-2 {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,101 @@
+@import url('../LamaranAnda/Lamaran.css');
+
+/* CARD */
+.card {
+  position: relative;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e0e0e0;
+  height: auto;
+  min-height: 180px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding-bottom: 10px;
+}
+
+.card-body {
+  padding: 20px;
+  flex: 1;
+}
+
+.card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 6px;
+}
+
+.card-perusahaan {
+  font-size: 0.95rem;
+  color: #888;
+  margin-bottom: 12px;
+}
+
+.card-pesan {
+  font-size: 0.95rem;
+  color: #555;
+  line-height: 1.4;
+}
+
+/* Tombol aksi */
+.action-buttons {
+  display: flex;
+  justify-content: left;
+  margin-top: 10px;
+  padding: 0 20px 10px;
+  gap: 10px;
+}
+
+.btn-hapus,
+.btn-selesai {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.btn-hapus {
+  background-color: #e74c3c;
+}
+.btn-hapus:hover {
+  background-color: #c0392b;
+}
+
+.btn-selesai {
+  background-color: #f39c12;
+}
+.btn-selesai:hover {
+  background-color: #27ae60;
+}
+
+/* Status Bulat */
+.status {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+}
+.status.diproses {
+  background-color: #EDB02D;
+}
+.status.ditolak {
+  background-color: #AE2828;
+}
+.status.diterima {
+  background-color: #28AE9D;
+}
+
+/* Grid Layout */
+.cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1000px;
+  padding: 20px;
+}

@@ -1,0 +1,56 @@
+{
+  "userPelamar": [
+    {
+      "id": "1",
+      "username": "Muhammad Salman",
+      "lamaran": [
+        {
+          "posisiLamaran": "Frontend Developer",
+          "perusahaan": "PT Nusantara",
+          "status": "Diterima"
+        },
+        {
+          "posisiLamaran": "UI/UX Designer",
+          "perusahaan": "CV Kreatif Digital",
+          "status": "Diproses"
+        },
+        {
+          "posisiLamaran": "Backend Developer",
+          "perusahaan": "PT Cloud Merdeka",
+          "status": "Ditolak"
+        },
+        {
+          "posisiLamaran": "Asisten Manager",
+          "perusahaan": "PT Antam",
+          "status": "Ditolak"
+        },
+        {
+          "posisiLamaran": "Manager",
+          "perusahaan": "Atlas",
+          "status": "Ditolak"
+        },
+        {
+          "posisiLamaran": "Backend Developer",
+          "perusahaan": "Telkomsel",
+          "status": "Ditolak"
+        }
+      ]
+    },
+    {
+      "id": "2",
+      "username": "Angga Rizky",
+      "lamaran": [
+        {
+          "posisiLamaran": "Software Engineer Intern",
+          "perusahaan": "PT Code Academy",
+          "status": "Diproses"
+        },
+        {
+          "posisiLamaran": "Data Analyst",
+          "perusahaan": "PT Data Insight",
+          "status": "Diterima"
+        }
+      ]
+    }
+  ]
+}

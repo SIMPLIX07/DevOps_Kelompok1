@@ -1,0 +1,99 @@
+
+.cards-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    padding: 20px;
+
+    grid-column: span 12;
+}
+
+
+.card-wawancara {
+    background: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    border: 1px solid #e5e7eb;
+
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+
+.posisi-pekerjaan {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 2px;
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
+
+.nama-perusahaan {
+    font-size: 18px;
+    font-weight: 400;
+    color: #000000;
+    margin-bottom: 25px;
+}
+
+/* Pesan: Polos tanpa background/garis */
+.pesan-teks {
+    margin-bottom: 20px;
+    font-size: 18px;
+    color: #333333;
+    font-style: normal;
+    line-height: 1.5;
+    flex-grow: 1;
+}
+
+.link-label {
+    font-size: 16px;
+    color: #000000;
+    margin-bottom: 2px;
+    margin-bottom: 20px;
+}
+
+.link-url {
+    word-break: break-all; 
+    color: #007bff;
+    text-decoration: none;
+    font-size: 16px;
+}
+
+/* Jadwal Info dengan Ikon Gambar */
+.jadwal-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+
+.jadwal-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.9rem;
+    color: #9ca3af; /* Warna teks abu-abu */
+}
+
+.icon-img {
+    width: 18px; /* Sesuaikan ukuran ikon */
+    height: 18px;
+    object-fit: contain;
+    filter: grayscale(100%); /* Memastikan gambar jadi abu-abu jika gambar aslinya berwarna */
+    opacity: 0.6; /* Memberikan efek abu-abu pudar */
+}
+
+@media (max-width: 1024px) {
+    .cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .cards-container {
+        grid-template-columns: 1fr;
+    }
+}

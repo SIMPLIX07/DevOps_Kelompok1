@@ -1,0 +1,84 @@
+.wp-cards-container {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 3 sejajar */
+    gap: 20px;
+    padding: 20px;
+    margin-top: 40px;
+    align-items: stretch;
+}
+
+
+.wp-card {
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    width: 100%;
+    height: 100%;
+}
+
+
+.wp-card-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #000000;
+    margin-bottom: 2px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+/* Nama Pelamar */
+.wp-card-company {
+    font-size: 18px;
+    font-weight: 400;
+    color: #000000;
+    margin-bottom: 25px;
+}
+
+/* Pesan */
+.wp-card-desc {
+    font-size: 18px;
+    color: #333333;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    flex-grow: 1;
+}
+
+/* Link */
+.wp-link-label {
+    font-size: 0.9rem;
+    color: #000000;
+    margin-bottom: 2px;
+}
+
+.wp-link-url {
+    color: #007bff;
+    font-size: 0.95rem;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.wp-link-url:hover {
+    text-decoration: underline;
+}
+
+/* Tanggal */
+.wp-card-date {
+    font-size: 0.9rem;
+    color: #9ca3af;
+    margin-top: auto;
+}
+
+@media (max-width: 1024px) {
+    .wp-cards-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .wp-cards-container {
+        grid-template-columns: 1fr;
+    }
+}

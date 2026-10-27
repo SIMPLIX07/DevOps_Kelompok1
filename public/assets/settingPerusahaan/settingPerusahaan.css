@@ -1,0 +1,154 @@
+.cstm-sidebar {
+    width: 280px;
+    background: linear-gradient(180deg, #16b3a3, #00193f);
+    flex-shrink: 0;
+}
+
+.cstm-sidebar h4 {
+    font-weight: 600;
+}
+
+.cstm-nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    display: flex;
+    align-items: center;
+    transition: background-color 0.3s;
+}
+
+.cstm-nav-link.active i {
+    color: inherit; 
+}
+
+.cstm-nav-link:hover {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cstm-nav-link:focus, 
+.cstm-nav-link:active {
+    color: white;
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.cstm-nav-link.active {
+    color: #00193f !important;
+    background-color: white !important;
+    font-weight: 600;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.cstm-content {
+    background-color: #ffffff;
+}
+
+.cstm-divider {
+    border: 0;
+    border-top: 1px solid #e0e0e0;
+    opacity: 1;
+}
+
+.cstm-avatar-circle {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background-color: #e0e0e0; 
+}
+
+.cstm-edit-icon {
+    width: 20px; 
+    height: 20px;
+}
+
+.cstm-field-group .form-label {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.cstm-display-input {
+    border: 1px solid #ced4da;
+    padding: 8px 12px;
+    border-radius: 4px;
+    background-color: white; 
+    color: #333;
+    cursor: default; 
+    opacity: 1; 
+}
+
+.cstm-display-input:focus {
+    box-shadow: none;
+    border-color: #ced4da;
+}
+.cstm-wide-modal {
+    max-width: 700px; 
+    width: 90%; 
+}
+
+.cstm-btn-batal {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.cstm-btn-batal:hover {
+    background-color: #c82333;
+    color: white;
+}
+
+.cstm-btn-simpan-teal {
+    background-color: #16b3a3;
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+}
+.cstm-btn-simpan-teal:hover {
+    background-color: #128f82;
+    color: white;
+}
+
+
+.modal-body .form-label {
+    font-weight: normal;
+    margin-bottom: 8px; 
+    display: block;
+}
+
+.modal-body .form-control {
+    border: 1px solid #ced4da;
+    background-color: white; 
+    padding: 10px 12px; 
+    height: auto; 
+}
+
+.cstm-toast-container {
+    width: 600px; 
+    max-width: 90%; 
+    z-index: 1050; 
+}
+
+#successToast {
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    width: 100%;
+}
+
+.cstm-link-keluar {
+    font-size: 16px;
+    text-decoration: none !important; 
+    color: #6c757d;
+    transition: color 0.3s ease;
+    border: none;
+    background: none;
+}
+
+.position-relative:hover img {
+    opacity: 0.4;
+    transition: 0.3s;
+}

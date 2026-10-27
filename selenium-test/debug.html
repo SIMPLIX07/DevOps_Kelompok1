@@ -1,0 +1,41 @@
+<html lang="en"><head>
+    <meta name="csrf-token" content="LAwkNgW1TWhaFFeOc79TvxPmuw72RZC6iwQJns2o">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Pelamar</title>
+    <link rel="stylesheet" href="/assets/LoginPelamar/login.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Login Pelamar</h2>
+
+                    <div style="color:red; margin-bottom:10px;">
+                <ul>
+                                            <li>Silakan login dulu</li>
+                                    </ul>
+            </div>
+        
+        
+        <form action="http://127.0.0.1:8000/login/pelamar" method="POST">
+            <input type="hidden" name="_token" value="LAwkNgW1TWhaFFeOc79TvxPmuw72RZC6iwQJns2o" autocomplete="off">
+            <div class="username">
+                <label for="username">Username</label>
+                <input type="text" name="username" id="usn" placeholder="Masukkan Username" value="">
+            </div>
+
+            <div class="password">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="pass" placeholder="Masukkan Password">
+            </div>
+
+            <div class="link">
+                <label id="forgot"><a href="#">Lupa password?</a></label>
+                <label id="register"><a href="/register/pelamar">Belum punya akun?</a></label>
+            </div>
+
+            <button type="submit" id="next">Lanjut</button>
+        </form>
+    </div>
+
+
+</body></html>

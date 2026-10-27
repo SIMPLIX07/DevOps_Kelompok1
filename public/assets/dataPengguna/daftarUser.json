@@ -1,0 +1,104 @@
+[
+  {
+    "id": "64f1c23abd9123a9e4e91c10",
+    "username": "muh.salman",
+    "password": "123456",
+    "namaLengkap": "Muhammad Salman Al Farizy",
+    "keahlian": ["Project Management", "Stakeholder Communication", "Agile"],
+    "lamaran": [
+      {
+        "perusahaan": "PT. Grab Indonesia",
+        "posisiLamaran": "Project Supervisor",
+        "status": "proses"
+      }
+    ]
+  },
+  {
+    "id": "64f1c23abd9123a9e4e91c11",
+    "username": "andi.wijaya",
+    "password": "qwerty",
+    "namaLengkap": "Andi Wijaya",
+    "keahlian": ["UI/UX Design", "Figma", "User Research"],
+    "lamaran": []
+  },
+  {
+    "id": "64f1c23abd9123a9e4e91c12",
+    "username": "sri.rahayu",
+    "password": "password123",
+    "namaLengkap": "Sri Rahayu",
+    "keahlian": ["Customer Service", "Microsoft Office", "Data Entry"],
+    "lamaran": []
+  },
+  {
+    "id": "65",
+    "username": "aditya.pratama",
+    "password": "aditPass65",
+    "namaLengkap": "Aditya Pratama",
+    "keahlian": ["Backend Development", "Node.js", "Database Design"],
+    "lamaran": []
+  },
+  {
+    "id": "66",
+    "username": "melissa.kurnia",
+    "password": "melissa66",
+    "namaLengkap": "Melissa Kurnia",
+    "keahlian": ["Photography", "Lightroom", "Photo Editing"],
+    "lamaran": []
+  },
+  {
+    "id": "67",
+    "username": "rizal.hamzah",
+    "password": "rizal67!",
+    "namaLengkap": "Rizal Hamzah",
+    "keahlian": ["Digital Marketing", "SEO", "Content Strategy"],
+    "lamaran": []
+  },
+  {
+    "id": "68",
+    "username": "fitri.anggraeni",
+    "password": "fitriPass68",
+    "namaLengkap": "Fitri Anggraeni",
+    "keahlian": ["Social Media Management", "Copywriting", "Analytics"],
+    "lamaran": []
+  },
+  {
+    "id": "69",
+    "username": "yoga.supriyanto",
+    "password": "yoga690",
+    "namaLengkap": "Yoga Supriyanto",
+    "keahlian": ["Frontend Development", "React", "TypeScript"],
+    "lamaran": []
+  },
+  {
+    "id": "70",
+    "username": "putri.novitasari",
+    "password": "putri700",
+    "namaLengkap": "Putri Novitasari",
+    "keahlian": ["Graphic Design", "Illustrator", "Branding"],
+    "lamaran": []
+  },
+  {
+    "id": "71",
+    "username": "dedi.santoso",
+    "password": "dediPass71",
+    "namaLengkap": "Dedi Santoso",
+    "keahlian": ["Network Administration", "Linux", "Security"],
+    "lamaran": []
+  },
+  {
+    "id": "72",
+    "username": "vania.prameswari",
+    "password": "vania722",
+    "namaLengkap": "Vania Prameswari",
+    "keahlian": ["Product Management", "Roadmapping", "Stakeholder Mgmt"],
+    "lamaran": []
+  },
+  {
+    "id": "73",
+    "username": "ahmad.fauzi",
+    "password": "afauzi73",
+    "namaLengkap": "Ahmad Fauzi",
+    "keahlian": ["QA Engineering", "Test Automation", "Selenium"],
+    "lamaran": []
+  }
+]

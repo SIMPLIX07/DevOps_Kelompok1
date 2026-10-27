@@ -1,0 +1,77 @@
+{
+    "perusahaan": [
+        {
+            "nama": "PT. Grab Indonesia",
+            "posisi": "Management",
+            "logo": "asset/logoGrab.png",
+            "lokasi": "Jakarta Pusat, Jakarta Raya",
+            "lowongan": [
+                {
+                    "judul": "Project Supervisor",
+                    "gaji": {
+                        "min": 5000000,
+                        "max": 10000000,
+                        "mata_uang": "IDR"
+                    },
+                    "tipe_pekerjaan": "Penuh Waktu",
+                    "deskripsi_pekerjaan": [
+                        "Bertanggung jawab untuk menjemput dan mengantarkan penumpang atau barang ke tujuan dengan aman, cepat, dan nyaman sesuai pesanan yang diterima melalui aplikasi Grab.",
+                        "Melakukan komunikasi yang sopan dan ramah dengan pelanggan untuk memberikan pengalaman perjalanan yang menyenangkan.",
+                        "Mengoperasikan aplikasi Grab secara efektif untuk menerima order, menentukan rute perjalanan, dan melakukan konfirmasi penyelesaian pesanan."
+                    ],
+                    "syarat": [
+                        "Memiliki SIM C (untuk pengemudi motor) atau SIM A (untuk pengemudi mobil) yang masih berlaku.",
+                        "Memiliki kendaraan pribadi dalam kondisi baik dan memenuhi standar kelayakan Grab.",
+                        "Memiliki smartphone Android/iOS yang kompatibel dengan aplikasi Grab."
+                    ]
+                }
+            ]
+        },
+        {
+            "nama": "PT. Gojek Indonesia",
+            "logo": "asset/logoGojek.png",
+            "posisi": "Asistent Manager",
+            "lokasi": "Jakarta Selatan, Jakarta Raya",
+            "lowongan": [
+                {
+                    "judul": "Driver Partner",
+                    "gaji": {
+                        "min": 4000000,
+                        "max": 9000000,
+                        "mata_uang": "IDR"
+                    },
+                    "tipe_pekerjaan": "Penuh Waktu / Paruh Waktu",
+                    "deskripsi_pekerjaan": [
+                        "Mengantar penumpang dan barang dengan aman sesuai pesanan melalui aplikasi Gojek.",
+                        "Berkomunikasi dengan sopan dan ramah kepada pelanggan.",
+                        "Menggunakan aplikasi Gojek untuk menerima order dan menyelesaikan perjalanan."
+                    ],
+                    "syarat": [
+                        "Memiliki SIM C (untuk motor) atau SIM A (untuk mobil) yang masih berlaku.",
+                        "Memiliki kendaraan pribadi yang layak pakai.",
+                        "Memiliki smartphone yang mendukung aplikasi Gojek."
+                    ]
+                },
+                {
+                    "judul": "Customer Service",
+                    "gaji": {
+                        "min": 5000000,
+                        "max": 8000000,
+                        "mata_uang": "IDR"
+                    },
+                    "tipe_pekerjaan": "Penuh Waktu",
+                    "deskripsi_pekerjaan": [
+                        "Melayani keluhan dan pertanyaan pelanggan melalui telepon atau chat.",
+                        "Menyelesaikan masalah pelanggan dengan cepat dan ramah.",
+                        "Mencatat laporan layanan pelanggan secara rutin."
+                    ],
+                    "syarat": [
+                        "Pendidikan minimal SMA/SMK.",
+                        "Mampu berkomunikasi dengan baik dan sopan.",
+                        "Mahir menggunakan komputer dan aplikasi office."
+                    ]
+                }
+            ]
+        }
+    ]
+}

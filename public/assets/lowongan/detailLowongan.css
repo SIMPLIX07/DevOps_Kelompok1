@@ -1,0 +1,231 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Inter', sans-serif;
+}
+
+/* MENGATUR LEBAR: 
+   Ubah nilai max-width di bawah ini untuk memperlebar kontainer (misal: 1100px atau 1200px) 
+*/
+.detail-wrapper {
+    max-width: 1100px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid #e0e0e0;
+    /* Border abu-abu pudar menggantikan shadow */
+}
+
+/* Banner Section */
+.banner-container {
+    width: 100%;
+    height: 200px;
+    position: relative;
+    background: #ddd;
+}
+
+.banner-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Profile Header - Sekarang berada di DALAM banner */
+.profile-overlay {
+    position: absolute;
+    bottom: 20px;
+    left: 30px;
+    display: flex;
+    align-items: center;
+    z-index: 2;
+}
+
+.company-logo {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 3px solid white;
+    background: white;
+    object-fit: cover;
+}
+
+.company-info-header {
+    margin-left: 15px;
+    text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.3);
+    /* Agar teks terbaca di atas gambar */
+}
+
+.company-info-header h4 {
+    margin: 0;
+    font-weight: 700;
+    color: white;
+}
+
+.company-info-header p {
+    margin: 0;
+    color: #f0f0f0;
+    font-size: 0.95rem;
+}
+
+/* Meta Info Bar - Vertikal */
+.meta-bar {
+    padding: 30px 40px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.meta-items {
+    display: flex;
+    flex-direction: column;
+    /* Membuat berjejer ke bawah */
+    gap: 10px;
+    color: #666;
+    font-size: 0.95rem;
+}
+
+.meta-items i {
+    width: 20px;
+    color: #999;
+    margin-right: 10px;
+}
+
+/* Action Buttons */
+.action-btns .btn {
+    border-radius: 8px;
+    padding: 10px;
+    width: 45px;
+    height: 45px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-edit {
+    background-color: #28AE9D;
+    color: white;
+    border: none;
+}
+
+.btn-delete {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    margin-right: 10px;
+}
+
+/* Content Sections */
+.content-section {
+    padding: 20px 40px;
+}
+
+.content-section h5 {
+    font-weight: 700;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.content-section p,
+.content-section li {
+    color: #555;
+    line-height: 1.6;
+}
+
+/* Table Pelamar */
+.pelamar-section {
+    padding: 40px;
+    background: #fff;
+}
+
+/* Table Pelamar */
+.table-custom { 
+    border-radius: 8px; 
+    overflow: hidden; 
+    border: 1px solid #e0e0e0;
+    border-collapse: separate; 
+    border-spacing: 0;   
+    width: 100%;
+}
+
+.table-custom thead th { 
+    background-color: #28AE9D !important; 
+    color: white !important; 
+    font-weight: 500; 
+    border: none; 
+    padding: 15px; 
+}
+
+.table-custom thead tr:first-child th:first-child {
+    border-top-left-radius: 8px;
+}
+
+
+.table-custom thead tr:first-child th:last-child {
+    border-top-right-radius: 8px;
+}
+
+.table-custom tbody td { 
+    vertical-align: middle; 
+    padding: 12px 15px; 
+    border-bottom: 1px solid #eee;
+    background-color: white; 
+}
+
+.table-custom tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.pelamar-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 10px;
+    object-fit: cover;
+}
+
+.container.mt-3 {
+    position: relative; 
+    max-width: 1200px; 
+    margin: 0 auto;
+}
+
+.back-button-container {
+    position: absolute; 
+    left: -10px;
+    top: 30px;   
+    z-index: 999;
+}
+
+@media (max-width: 1200px) {
+    .back-button-container {
+        position: static; 
+        margin-bottom: 20px;
+        padding-left: 15px;
+    }
+}
+
+.btn-back {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 45px;
+    height: 45px;
+    background-color: white;
+    color: #28AE9D; 
+    border: 1px solid #e0e0e0;
+    border-radius: 50%; 
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); /* Shadow dipertegas agar terlihat melayang */
+}
+
+.btn-back:hover {
+    background-color: #28AE9D;
+    color: white;
+    border-color: #28AE9D;
+    transform: scale(1.1); /* Efek membesar sedikit saat hover */
+}
+
+.btn-back i {
+    font-size: 1.2rem;
+}

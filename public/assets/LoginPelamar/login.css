@@ -1,0 +1,99 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+*{
+    margin:0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'inter', sans-serif;
+}
+
+body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    background:linear-gradient(to bottom right, #1FACA2, #114841);
+}
+
+.container{
+    color: #ffff;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 40px;
+    background-color: #434343;
+    width: 400px;
+    height: 400px;
+}
+
+.container .username label{
+    margin-bottom: 5px;
+}
+
+.container .password label{
+    margin-bottom: 5px;
+}
+
+.container .username{
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+    margin-top: 40px;
+}
+
+.container .username input{
+    border-radius: 7px;
+    width: 350px;
+    height: 40px;
+}
+
+.container .password input{
+    border-radius: 7px;
+    width: 350px;
+    height: 40px;
+}
+
+.container .password{
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+}
+
+.container .link{
+    width: 350px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    margin-top: 20px;
+    margin-bottom: 50px;
+}
+
+.container .link a {
+    color: white;
+    text-decoration: none;
+}
+
+.container .link #register a{
+    color: #1FACA2;
+    text-decoration: none;
+}
+
+
+.container .link #register{
+    color: #1FACA2;
+}
+
+.container button{
+    font-weight: bold;
+    color: #ffff;
+    background-color: #1FACA2;
+    width: 140px;
+    height: 35px;
+    border: none;
+    border-radius: 7px;
+}

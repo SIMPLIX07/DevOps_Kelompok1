@@ -1,0 +1,37 @@
+[
+  {
+    "posisi": "Software Engineer",
+    "nama_perusahaan": "TechNova Solutions",
+    "deskripsi": "Mengembangkan dan memelihara aplikasi web berbasis Laravel dan React, serta berkolaborasi dengan tim UI/UX untuk meningkatkan pengalaman pengguna.",
+    "lokasi": "Jakarta, Indonesia",
+    "img": "https://example.com/images/technova_logo.png"
+  },
+  {
+    "posisi": "UI/UX Designer",
+    "nama_perusahaan": "Creative Labs Studio",
+    "deskripsi": "Bertanggung jawab untuk merancang antarmuka pengguna yang intuitif dan menarik, melakukan user testing, serta membuat prototipe desain interaktif.",
+    "lokasi": "Bandung, Indonesia",
+    "img": "https://example.com/images/creativelabs_logo.png"
+  },
+  {
+    "posisi": "Data Analyst",
+    "nama_perusahaan": "Insight Data Corp",
+    "deskripsi": "Menganalisis data bisnis menggunakan Python dan Power BI untuk membantu manajemen dalam pengambilan keputusan strategis.",
+    "lokasi": "Surabaya, Indonesia",
+    "img": "https://example.com/images/insightdata_logo.png"
+  },
+  {
+    "posisi": "Digital Marketing Specialist",
+    "nama_perusahaan": "GrowUp Agency",
+    "deskripsi": "Mengelola kampanye digital melalui platform media sosial dan Google Ads, serta mengoptimalkan SEO untuk meningkatkan traffic website.",
+    "lokasi": "Yogyakarta, Indonesia",
+    "img": "https://example.com/images/growup_logo.png"
+  },
+  {
+    "posisi": "Project Manager",
+    "nama_perusahaan": "PT Global Inovasi",
+    "deskripsi": "Mengatur jalannya proyek perangkat lunak dari tahap perencanaan hingga implementasi, serta memastikan target waktu dan kualitas tercapai.",
+    "lokasi": "Medan, Indonesia",
+    "img": "https://example.com/images/globalinovasi_logo.png"
+  }
+]
