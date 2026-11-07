@@ -93,9 +93,7 @@ Route::post('/lamaran/{id}/batalkan', [LamaranController::class, 'batalkan']);
 // Setting Pelamar
 Route::get('/pelamar/setting', [PelamarController::class, 'settings'])->name('pelamar.settings');
 Route::post('/pelamar/setting/update', [PelamarController::class, 'updateProfil'])->name('pelamar.update');
-Route::get('/pelamar/keamanan', function () {
-    return "Halaman Keamanan (Belum Dibuat)";
-})->name('pelamar.keamanan');
+Route::get('/pelamar/keamanan', [PelamarController::class, 'keamanan'])->name('pelamar.keamanan');
 
 // Lowongan
 Route::prefix('lowongan')->group(function () {
@@ -166,6 +164,11 @@ Route::post(
     '/perusahaan/wawancara/{id}/tolak',
     [WawancaraController::class, 'tolak']
 )->name('perusahaan.wawancara.tolak');
+
+Route::match(['put', 'post'],
+    '/perusahaan/wawancara/{id}/reschedule',
+    [WawancaraController::class, 'reschedule']
+)->name('perusahaan.wawancara.reschedule');
 
 Route::get(
     '/perusahaan/karyawan/by-kategori/{kategori}',

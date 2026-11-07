@@ -21,6 +21,7 @@ class Wawancara extends Model
         'tanggal',
         'link_meet',
         'pesan',
+        'catatan_reschedule',
     ];
 
     public function pelamar()

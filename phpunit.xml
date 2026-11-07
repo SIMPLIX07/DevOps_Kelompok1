@@ -20,6 +20,15 @@
         <testsuite name="RekapPelamarCsv">
             <directory>tests/RekapPelamarCsv</directory>
         </testsuite>
+        <testsuite name="AlasanPenolakan">
+            <directory>tests/AlasanPenolakan</directory>
+        </testsuite>
+        <testsuite name="KeamananAkun">
+            <directory>tests/KeamananAkun</directory>
+        </testsuite>
+        <testsuite name="RescheduleWawancara">
+            <directory>tests/RescheduleWawancara</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>
