@@ -13,8 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class CVController extends Controller
 {
-    private const LOGIN_ROUTE = '/login';
-
     /**
      * Display a listing of the resource.
      */
@@ -23,7 +21,7 @@ class CVController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login');
         }
 
         $cvs = Cv::with([
@@ -48,7 +46,7 @@ class CVController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE)->withErrors('Silakan login dulu');
+            return redirect('/login')->withErrors('Silakan login dulu');
         }
 
         $pelamar = Pelamar::findOrFail($pelamarId);
@@ -65,7 +63,7 @@ class CVController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login');
         }
 
 
@@ -165,7 +163,7 @@ class CVController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login');
         }
 
         $request->validate([
@@ -253,7 +251,7 @@ class CVController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login');
         }
 
         try {

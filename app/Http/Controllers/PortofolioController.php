@@ -8,15 +8,12 @@ use Illuminate\Http\Request;
 
 class PortofolioController extends Controller
 {
-    private const LOGIN_ROUTE = '/login/pelamar';
-    private const PORTOFOLIO_ROUTE = '/portofolio';
-
     public function index()
     {
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/pelamar');
         }
 
         $portofolios = Portofolio::where('pelamar_id', $pelamarId)
@@ -31,7 +28,7 @@ class PortofolioController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE)->withErrors('Silakan login dulu');
+            return redirect('/login/pelamar')->withErrors('Silakan login dulu');
         }
 
         $pelamar = Pelamar::findOrFail($pelamarId);
@@ -44,7 +41,7 @@ class PortofolioController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/pelamar');
         }
 
         $validated = $request->validate([
@@ -63,7 +60,7 @@ class PortofolioController extends Controller
             ...$validated,
         ]);
 
-        return redirect(self::PORTOFOLIO_ROUTE)->with('success', 'Portofolio berhasil disimpan');
+        return redirect('/portofolio')->with('success', 'Portofolio berhasil disimpan');
     }
 
     public function edit($id)
@@ -71,7 +68,7 @@ class PortofolioController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE)->withErrors('Silakan login dulu');
+            return redirect('/login/pelamar')->withErrors('Silakan login dulu');
         }
 
         $portofolio = Portofolio::where('id', $id)
@@ -86,7 +83,7 @@ class PortofolioController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/pelamar');
         }
 
         $validated = $request->validate([
@@ -106,7 +103,7 @@ class PortofolioController extends Controller
 
         $portofolio->update($validated);
 
-        return redirect(self::PORTOFOLIO_ROUTE)->with('success', 'Portofolio berhasil diperbarui');
+        return redirect('/portofolio')->with('success', 'Portofolio berhasil diperbarui');
     }
 
     public function destroy($id)
@@ -114,13 +111,13 @@ class PortofolioController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/pelamar');
         }
 
         Portofolio::where('id', $id)
             ->where('pelamar_id', $pelamarId)
             ->delete();
 
-        return redirect(self::PORTOFOLIO_ROUTE)->with('success', 'Portofolio berhasil dihapus');
+        return redirect('/portofolio')->with('success', 'Portofolio berhasil dihapus');
     }
 }

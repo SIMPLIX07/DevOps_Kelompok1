@@ -10,9 +10,6 @@ use Illuminate\Support\Facades\Storage;
 
 class PerusahaanController extends Controller
 {
-    private const LOGIN_ROUTE = '/login/perusahaan';
-    private const PROFIL_STORAGE_PATH = 'perusahaan/profil';
-
     public function login(Request $request)
     {
         $request->validate([
@@ -26,9 +23,13 @@ class PerusahaanController extends Controller
             return back()->withErrors(['email' => 'Email atau password salah']);
         }
 
-        $verificationError = $this->checkVerificationStatus($perusahaan);
-        if ($verificationError) {
-            return back()->withErrors(['email' => $verificationError]);
+        // Cek status verifikasi
+        if ($perusahaan->status_verifikasi !== 'verified') {
+            if ($perusahaan->status_verifikasi === 'pending') {
+                return back()->withErrors(['email' => 'Akun Anda masih menunggu verifikasi dari admin. Silakan tunggu konfirmasi via email.']);
+            } else if ($perusahaan->status_verifikasi === 'rejected') {
+                return back()->withErrors(['email' => 'Akun Anda ditolak. Alasan: ' . $perusahaan->alasan_penolakan]);
+            }
         }
 
         session([
@@ -39,19 +40,6 @@ class PerusahaanController extends Controller
         ]);
 
         return redirect('/home-perusahaan');
-    }
-
-    private function checkVerificationStatus(Perusahaan $perusahaan): ?string
-    {
-        if ($perusahaan->status_verifikasi === 'pending') {
-            return 'Akun Anda masih menunggu verifikasi dari admin. Silakan tunggu konfirmasi via email.';
-        }
-
-        if ($perusahaan->status_verifikasi === 'rejected') {
-            return 'Akun Anda ditolak. Alasan: ' . $perusahaan->alasan_penolakan;
-        }
-
-        return null;
     }
 
     public function register(Request $request)
@@ -83,7 +71,7 @@ class PerusahaanController extends Controller
 
         if ($request->hasFile('foto_profil')) {
             $fotoProfilPath = $request->file('foto_profil')->store(
-                self::PROFIL_STORAGE_PATH,
+                'perusahaan/profil',
                 'public'
             );
         }
@@ -104,7 +92,7 @@ class PerusahaanController extends Controller
         ]);
 
         // Pop Up menunggu verifikasi
-        return redirect(self::LOGIN_ROUTE)->with('info', 'Registrasi berhasil!
+        return redirect('/login/perusahaan')->with('info', 'Registrasi berhasil!
          Tunggu verifikasi dari admin sebelum login. Kami akan mengirimkan email konfirmasi.');
     }
 
@@ -132,12 +120,12 @@ class PerusahaanController extends Controller
         $perusahaanId = session('perusahaan_id');
 
         if (!$perusahaanId) {
-            return redirect(self::LOGIN_ROUTE)->with('error', 'Anda harus login untuk mengakses pengaturan.');
+            return redirect('/login/perusahaan')->with('error', 'Anda harus login untuk mengakses pengaturan.');
         }
         $perusahaan = Perusahaan::find($perusahaanId);
 
         if (!$perusahaan) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/perusahaan');
         }
 
         return view('perusahaan.settingPerusahaan', compact('perusahaan'));
@@ -147,7 +135,7 @@ class PerusahaanController extends Controller
     {
         $perusahaanId = session('perusahaan_id');
         if (!$perusahaanId) {
-            return redirect(self::LOGIN_ROUTE)->with('error', 'Akses ditolak. Silakan login kembali.');
+            return redirect('/login/perusahaan')->with('error', 'Akses ditolak. Silakan login kembali.');
         }
 
         $perusahaan = Perusahaan::find($perusahaanId);
@@ -171,7 +159,7 @@ class PerusahaanController extends Controller
             }
 
             $fotoProfilPath = $request->file('foto_profil')->store(
-                self::PROFIL_STORAGE_PATH,
+                'perusahaan/profil',
                 'public'
             );
         }
@@ -219,7 +207,7 @@ class PerusahaanController extends Controller
                 Storage::disk('public')->delete($perusahaan->foto_profil);
             }
 
-            $path = $request->file('foto_profil')->store(self::PROFIL_STORAGE_PATH, 'public');
+            $path = $request->file('foto_profil')->store('perusahaan/profil', 'public');
             
             $perusahaan->update([
                 'foto_profil' => $path

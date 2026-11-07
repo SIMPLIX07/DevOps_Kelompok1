@@ -186,10 +186,7 @@ class LamaranController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            if (request()->expectsJson()) {
-                return response()->json(['message' => 'Silakan login terlebih dahulu.'], 401);
-            }
-            return redirect('/login/pelamar')->withErrors('Silakan login terlebih dahulu.');
+            return $this->cancelResponse('Silakan login terlebih dahulu.', 401, redirect('/login/pelamar')->withErrors('Silakan login terlebih dahulu.'));
         }
 
         $lamaran = Lamaran::where('id', $id)
@@ -197,24 +194,29 @@ class LamaranController extends Controller
             ->firstOrFail();
 
         if ($lamaran->status === 'diterima') {
-            if (request()->expectsJson()) {
-                return response()->json(['message' => 'Lamaran yang sudah diterima tidak dapat dibatalkan.'], 400);
-            }
-            return back()->with('error', 'Lamaran yang sudah diterima tidak dapat dibatalkan.');
+            return $this->cancelResponse('Lamaran yang sudah diterima tidak dapat dibatalkan.', 400, back()->with('error', 'Lamaran yang sudah diterima tidak dapat dibatalkan.'));
         }
 
-        // Hapus juga wawancara terkait jika ada
+        $this->executePembatalan($lamaran, $pelamarId);
+
+        return $this->cancelResponse('Lamaran berhasil dibatalkan.', 200, back()->with('success', 'Lamaran berhasil dibatalkan.'));
+    }
+
+    private function executePembatalan(Lamaran $lamaran, int $pelamarId): void
+    {
         Wawancara::where('pelamar_id', $pelamarId)
             ->where('lowongan_id', $lamaran->lowongan_id)
             ->delete();
 
         $lamaran->delete();
+    }
 
+    private function cancelResponse(string $message, int $statusCode, $redirectResponse)
+    {
         if (request()->expectsJson()) {
-            return response()->json(['message' => 'Lamaran berhasil dibatalkan.']);
+            return response()->json(['message' => $message], $statusCode);
         }
-
-        return back()->with('success', 'Lamaran berhasil dibatalkan.');
+        return $redirectResponse;
     }
 
     /**

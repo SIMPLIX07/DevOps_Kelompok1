@@ -12,12 +12,10 @@ use App\Services\PelamarCsvExporter;
 
 class LowonganController extends Controller
 {
-    private const LOGIN_ROUTE = '/login/perusahaan';
-
     public function index(Request $request) // Tambahkan Request $request
     {
         if (!session('perusahaan_id')) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/perusahaan');
         }
 
         // Ambil keyword dari input 'q'
@@ -63,7 +61,7 @@ class LowonganController extends Controller
     public function create()
     {
         if (!session('perusahaan_id')) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/perusahaan');
         }
 
         return view('lowongan.tambahLowongan');
@@ -72,7 +70,7 @@ class LowonganController extends Controller
     public function store(Request $request)
     {
         if (!session('perusahaan_id')) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/perusahaan');
         }
 
         $request->validate([
@@ -122,7 +120,7 @@ class LowonganController extends Controller
     public function showDetail($id)
     {
         if (!session('perusahaan_id')) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/perusahaan');
         }
 
         $lowongan = Lowongan::with(['perusahaan', 'lamarans.pelamar'])
@@ -142,7 +140,7 @@ class LowonganController extends Controller
     public function edit($id)
     {
         if (!session('perusahaan_id')) {
-            return redirect(self::LOGIN_ROUTE);
+            return redirect('/login/perusahaan');
         }
 
         $lowongan = Lowongan::findOrFail($id);
@@ -200,45 +198,23 @@ class LowonganController extends Controller
 
     public function listPelamar(Request $request)
     {
-        $acceptedLamaran = $this->checkAcceptedLamaran();
-
-        $query = Lowongan::with('perusahaan')
-            ->where('tanggal_berakhir', '>=', Carbon::today());
-
-        $this->applySearchFilters($query, $request);
-        $this->applyGajiFilter($query, $request->gaji_range);
-        $this->applyJenisPekerjaanFilter($query, $request->jenis_pekerjaan);
-        $this->applySorting($query, $request->query('sort', 'terbaru'));
-
-        $lowongans = $query->paginate(12);
-        $lokasiOptions = $this->getLokasiOptions();
-        $bookmarkedIds = $this->getBookmarkedIds();
-
-        return view('home', compact('lowongans', 'lokasiOptions', 'bookmarkedIds', 'acceptedLamaran'));
-    }
-
-    private function checkAcceptedLamaran()
-    {
         $pelamarId = session('pelamar_id');
-        if (!$pelamarId) {
-            return null;
+        $acceptedLamaran = null;
+        if ($pelamarId) {
+            $acceptedLamaran = \App\Models\Lamaran::with('lowongan.perusahaan')
+                ->where('pelamar_id', $pelamarId)
+                ->where('status', 'diterima')
+                ->where('popup_diterima_tampil', false)
+                ->first();
+            
+            if ($acceptedLamaran) {
+                $acceptedLamaran->update(['popup_diterima_tampil' => true]);
+            }
         }
 
-        $acceptedLamaran = \App\Models\Lamaran::with('lowongan.perusahaan')
-            ->where('pelamar_id', $pelamarId)
-            ->where('status', 'diterima')
-            ->where('popup_diterima_tampil', false)
-            ->first();
-
-        if ($acceptedLamaran) {
-            $acceptedLamaran->update(['popup_diterima_tampil' => true]);
-        }
-
-        return $acceptedLamaran;
-    }
-
-    private function applySearchFilters($query, Request $request): void
-    {
+        $query = Lowongan::with('perusahaan');
+        $query->where('tanggal_berakhir', '>=', Carbon::today());
+        // Filter: Kata Kunci (Posisi, kategori, atau nama perusahaan)
         if ($request->filled('q')) {
             $search = $request->q;
             $query->where(function ($q) use ($search) {
@@ -250,6 +226,8 @@ class LowonganController extends Controller
             });
         }
 
+        // Filter: Lokasi
+        // Nilai lokasi bisa berformat "Kabupaten, Provinsi" — ekstrak bagian kabupaten saja
         if ($request->filled('lokasi')) {
             $lokasi = trim(explode(',', $request->lokasi)[0]);
             $query->where(function ($q) use ($lokasi) {
@@ -258,74 +236,74 @@ class LowonganController extends Controller
                   ->orWhere('alamat_lengkap', 'like', "%{$lokasi}%");
             });
         }
-    }
 
-    private function applyGajiFilter($query, ?string $range): void
-    {
-        if (!$range) {
-            return;
+        // Filter: Rentang Gaji
+        if ($request->filled('gaji_range')) {
+            $range = $request->gaji_range;
+            
+            if (\DB::connection()->getDriverName() === 'sqlite') {
+                $pdo = \DB::connection()->getPdo();
+                $pdo->sqliteCreateFunction('SUBSTRING_INDEX', function ($string, $delim, $count) {
+                    if ($string === null) return null;
+                    $parts = explode($delim, $string);
+                    if ($count > 0) {
+                        return implode($delim, array_slice($parts, 0, $count));
+                    } else {
+                        return implode($delim, array_slice($parts, $count));
+                    }
+                });
+            }
+
+            $cleanSql = "CAST(SUBSTRING_INDEX(REPLACE(REPLACE(REPLACE(gaji, 'Rp', ''), '.', ''), ' ', ''), '-', 1) AS UNSIGNED)";
+            $cleanSqlMax = "CAST(SUBSTRING_INDEX(REPLACE(REPLACE(REPLACE(gaji, 'Rp', ''), '.', ''), ' ', ''), '-', -1) AS UNSIGNED)";
+
+            if ($range === 'under_5m') {
+                $query->whereRaw("$cleanSql < 5000000");
+            } elseif ($range === '5m_10m') {
+                $query->whereRaw("$cleanSql <= 10000000 AND $cleanSqlMax >= 5000000");
+            } elseif ($range === '10m_15m') {
+                $query->whereRaw("$cleanSql <= 15000000 AND $cleanSqlMax >= 10000000");
+            } elseif ($range === 'above_15m') {
+                $query->whereRaw("$cleanSqlMax > 15000000");
+            }
         }
 
-        if (\DB::connection()->getDriverName() === 'sqlite') {
-            $pdo = \DB::connection()->getPdo();
-            $pdo->sqliteCreateFunction('SUBSTRING_INDEX', function ($string, $delim, $count) {
-                if ($string === null) {
-                    return null;
-                }
-                $parts = explode($delim, $string);
-                if ($count > 0) {
-                    return implode($delim, array_slice($parts, 0, $count));
-                }
-                return implode($delim, array_slice($parts, $count));
-            });
+        // Filter: Jenis Pekerjaan
+        if ($request->filled('jenis_pekerjaan')) {
+            $jenis = $request->jenis_pekerjaan;
+            if ($jenis === 'Full-time') {
+                $query->where(function ($q) {
+                    $q->where('jenis_pekerjaan', 'like', 'Full%');
+                });
+            } elseif ($jenis === 'Part-time') {
+                $query->where(function ($q) {
+                    $q->where('jenis_pekerjaan', 'like', 'Part%');
+                });
+            } else {
+                $query->where('jenis_pekerjaan', 'like', "%{$jenis}%");
+            }
         }
 
-        $cleanSql = "CAST(SUBSTRING_INDEX(REPLACE(REPLACE(REPLACE(gaji, 'Rp', ''), '.', ''), ' ', ''), '-', 1) AS UNSIGNED)";
-        $cleanSqlMax = "CAST(SUBSTRING_INDEX(REPLACE(REPLACE(REPLACE(gaji, 'Rp', ''), '.', ''), ' ', ''), '-', -1) AS UNSIGNED)";
-
-        if ($range === 'under_5m') {
-            $query->whereRaw("$cleanSql < 5000000");
-        } elseif ($range === '5m_10m') {
-            $query->whereRaw("$cleanSql <= 10000000 AND $cleanSqlMax >= 5000000");
-        } elseif ($range === '10m_15m') {
-            $query->whereRaw("$cleanSql <= 15000000 AND $cleanSqlMax >= 10000000");
-        } elseif ($range === 'above_15m') {
-            $query->whereRaw("$cleanSqlMax > 15000000");
-        }
-    }
-
-    private function applyJenisPekerjaanFilter($query, ?string $jenis): void
-    {
-        if (!$jenis) {
-            return;
-        }
-
-        if ($jenis === 'Full-time') {
-            $query->where('jenis_pekerjaan', 'like', 'Full%');
-        } elseif ($jenis === 'Part-time') {
-            $query->where('jenis_pekerjaan', 'like', 'Part%');
-        } else {
-            $query->where('jenis_pekerjaan', 'like', "%{$jenis}%");
-        }
-    }
-
-    private function applySorting($query, string $sort): void
-    {
+        // Sorting: Terbaru / Terlama
+        $sort = $request->query('sort', 'terbaru');
         if ($sort === 'terlama') {
             $query->orderBy('created_at', 'asc');
         } else {
             $query->orderBy('created_at', 'desc');
         }
-    }
 
-    private function getLokasiOptions(): array
-    {
+        // Paginate: 12 items (3 rows on a 4-column desktop layout)
+        $lowongans = $query->paginate(12);
+
+        // Ambil opsi lokasi unik dari database berdasarkan lokasi lowongan yang tersedia
+        // Gabungkan kabupaten + provinsi, filter yang tidak valid (panjang < 3 karakter)
         $dbLokasi = Lowongan::whereNotNull('kabupaten')
             ->where('kabupaten', '!=', '')
             ->whereRaw('LENGTH(TRIM(kabupaten)) >= 3')
             ->select('kabupaten', 'provinsi')
             ->get();
 
+        // Build label "Kabupaten, Provinsi" dan deduplicate
         $lokasiOptions = [];
         foreach ($dbLokasi as $row) {
             $kab = ucwords(strtolower(trim($row->kabupaten)));
@@ -336,19 +314,16 @@ class LowonganController extends Controller
         $lokasiOptions = array_values($lokasiOptions);
         sort($lokasiOptions);
 
-        return $lokasiOptions;
-    }
-
-    private function getBookmarkedIds(): array
-    {
+        // Ambil ID lowongan yang sudah di-bookmark oleh pelamar yang sedang login
+        $bookmarkedIds = [];
         $pelamarId = session('pelamar_id');
-        if (!$pelamarId) {
-            return [];
+        if ($pelamarId) {
+            $bookmarkedIds = Bookmark::where('pelamar_id', $pelamarId)
+                ->pluck('lowongan_id')
+                ->toArray();
         }
 
-        return Bookmark::where('pelamar_id', $pelamarId)
-            ->pluck('lowongan_id')
-            ->toArray();
+        return view('home', compact('lowongans', 'lokasiOptions', 'bookmarkedIds', 'acceptedLamaran'));
     }
 
     /**
@@ -358,7 +333,7 @@ class LowonganController extends Controller
     {
         $perusahaanId = session('perusahaan_id');
         if (!$perusahaanId) {
-            return redirect(self::LOGIN_ROUTE)->withErrors('Silakan login sebagai perusahaan.');
+            return redirect('/login/perusahaan')->withErrors('Silakan login sebagai perusahaan.');
         }
 
         $lowongan = Lowongan::where('id', $id)

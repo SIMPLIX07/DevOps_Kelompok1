@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Models\Cv;
+use App\Models\Lamaran;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PelamarCsvExporter
@@ -42,38 +44,49 @@ class PelamarCsvExporter
 
             $no = 1;
             foreach ($lamarans as $lamaran) {
-                $cv = $lamaran->cv;
-                $pendidikanTerakhir = '-';
-                if ($cv && $cv->pendidikans && $cv->pendidikans->count() > 0) {
-                    $lastP = $cv->pendidikans->last();
-                    $pendidikanTerakhir = trim("{$lastP->tingkat} {$lastP->jurusan} - {$lastP->universitas}");
-                }
-
-                $skills = '-';
-                if ($cv && $cv->skills && $cv->skills->count() > 0) {
-                    $skills = $cv->skills->pluck('skill')->implode(', ');
-                }
-
-                $portofolio = '-';
-                if ($lamaran->portofolio) {
-                    $portofolio = $lamaran->portofolio->judul;
-                }
-
-                fputcsv($file, [
-                    $no++,
-                    $lamaran->pelamar->nama_lengkap ?? '-',
-                    $lamaran->pelamar->email ?? '-',
-                    $cv->kontak ?? ($lamaran->pelamar->no_telp ?? '-'),
-                    $lamaran->lowongan->posisi_pekerjaan ?? '-',
-                    ucfirst($lamaran->status),
-                    $lamaran->created_at ? $lamaran->created_at->format('d/m/Y H:i') : '-',
-                    $pendidikanTerakhir,
-                    $skills,
-                    $portofolio,
-                ]);
+                fputcsv($file, $this->formatRow($no++, $lamaran));
             }
 
             fclose($file);
         }, 200, $headers);
+    }
+
+    private function formatRow(int $no, Lamaran $lamaran): array
+    {
+        $cv = $lamaran->cv;
+        $pelamar = $lamaran->pelamar;
+        $lowongan = $lamaran->lowongan;
+
+        return [
+            $no,
+            $pelamar->nama_lengkap ?? '-',
+            $pelamar->email ?? '-',
+            $cv->kontak ?? ($pelamar->no_telp ?? '-'),
+            $lowongan->posisi_pekerjaan ?? '-',
+            ucfirst($lamaran->status),
+            $lamaran->created_at ? $lamaran->created_at->format('d/m/Y H:i') : '-',
+            $this->resolvePendidikanTerakhir($cv),
+            $this->resolveSkills($cv),
+            $lamaran->portofolio->judul ?? '-',
+        ];
+    }
+
+    private function resolvePendidikanTerakhir(?Cv $cv): string
+    {
+        if (!$cv || !$cv->pendidikans || $cv->pendidikans->isEmpty()) {
+            return '-';
+        }
+
+        $lastP = $cv->pendidikans->last();
+        return trim("{$lastP->tingkat} {$lastP->jurusan} - {$lastP->universitas}");
+    }
+
+    private function resolveSkills(?Cv $cv): string
+    {
+        if (!$cv || !$cv->skills || $cv->skills->isEmpty()) {
+            return '-';
+        }
+
+        return $cv->skills->pluck('skill')->implode(', ');
     }
 }
