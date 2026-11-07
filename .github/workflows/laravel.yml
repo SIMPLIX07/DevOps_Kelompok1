@@ -117,14 +117,13 @@ jobs:
           name: code-coverage-report
 
       # Run SonarQube Analysis
-      - name: SonarCloud / SonarQube Scanner
-        uses: SonarSource/sonarcloud-github-action@master
+      - name: SonarQube Scanner
+        uses: SonarSource/sonarqube-scan-action@v8.3.0
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         with:
           args: >
-            -Dsonar.projectKey=SIMPLIX07_a
+            -Dsonar.projectKey=SIMPLIX07_DevOps_Kelompok1
             -Dsonar.organization=simplix07
             -Dsonar.sources=app
             -Dsonar.tests=tests
