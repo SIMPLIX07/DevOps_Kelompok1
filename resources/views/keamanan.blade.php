@@ -54,7 +54,7 @@
         <div class="mb-8">
             <h1 class="text-2xl sm:text-3xl font-bold font-['Manrope'] text-on-surface flex items-center gap-2">
                 <span class="material-symbols-outlined text-secondary text-3xl">security</span>
-                Keamanan &amp; Kata Sandi
+                Keamanan dan Kata Sandi
             </h1>
             <p class="text-sm text-on-surface-variant mt-1">
                 Kelola keamanan akun dan perbarui kata sandi Anda secara berkala.

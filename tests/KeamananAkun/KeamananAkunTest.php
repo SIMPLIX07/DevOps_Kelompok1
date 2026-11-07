@@ -43,7 +43,7 @@ class KeamananAkunTest extends TestCase
             ->get('/pelamar/keamanan');
 
         $response->assertStatus(200);
-        $response->assertSee('Keamanan &amp; Kata Sandi');
+        $response->assertSee('Keamanan dan Kata Sandi');
         $response->assertSee($this->pelamar->email);
     }
 
