@@ -67,6 +67,12 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, bcmath, zip
           coverage: pcov
 
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
       - name: Cache Composer Dependencies
         uses: actions/cache@v4
         with:
@@ -76,6 +82,13 @@ jobs:
 
       - name: Install Dependencies
         run: composer install -q --no-ansi --no-interaction --no-scripts --prefer-dist
+
+      # Build Frontend Assets for Testing
+      - name: Install NPM Dependencies
+        run: npm ci
+
+      - name: Build Frontend Assets
+        run: npm run build
 
       # Setup Laravel Test Environment
       - name: Setup Laravel Test Environment
