@@ -176,4 +176,133 @@ class LamaranController extends Controller
 
         return back()->with('success', 'Undangan wawancara berhasil dikirim.');
     }
+
+    /**
+     * Pelamar membatalkan lamaran pekerjaan.
+     */
+    public function batalkan($id)
+    {
+        $pelamarId = session('pelamar_id');
+
+        if (!$pelamarId) {
+            if (request()->expectsJson()) {
+                return response()->json(['message' => 'Silakan login terlebih dahulu.'], 401);
+            }
+            return redirect('/login/pelamar')->withErrors('Silakan login terlebih dahulu.');
+        }
+
+        $lamaran = Lamaran::where('id', $id)
+            ->where('pelamar_id', $pelamarId)
+            ->firstOrFail();
+
+        if ($lamaran->status === 'diterima') {
+            if (request()->expectsJson()) {
+                return response()->json(['message' => 'Lamaran yang sudah diterima tidak dapat dibatalkan.'], 400);
+            }
+            return back()->with('error', 'Lamaran yang sudah diterima tidak dapat dibatalkan.');
+        }
+
+        // Hapus juga wawancara terkait jika ada
+        Wawancara::where('pelamar_id', $pelamarId)
+            ->where('lowongan_id', $lamaran->lowongan_id)
+            ->delete();
+
+        $lamaran->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Lamaran berhasil dibatalkan.']);
+        }
+
+        return back()->with('success', 'Lamaran berhasil dibatalkan.');
+    }
+
+    /**
+     * Rekap semua pelamar perusahaan ke file CSV.
+     */
+    public function exportPelamarCsv(Request $request)
+    {
+        $perusahaanId = session('perusahaan_id');
+
+        if (!$perusahaanId) {
+            return redirect('/login/perusahaan')->withErrors('Silakan login sebagai perusahaan.');
+        }
+
+        $statusFilter = $request->query('status');
+
+        $query = Lamaran::with(['pelamar', 'lowongan', 'cv.pendidikans', 'cv.skills', 'portofolio'])
+            ->whereHas('lowongan', function ($q) use ($perusahaanId) {
+                $q->where('perusahaan_id', $perusahaanId);
+            });
+
+        if ($statusFilter && in_array($statusFilter, ['diproses', 'wawancara', 'diterima', 'ditolak'])) {
+            $query->where('status', $statusFilter);
+        }
+
+        $lamarans = $query->latest()->get();
+
+        $filename = "rekap-pelamar-" . ($statusFilter ? "{$statusFilter}-" : "semua-") . date('Y-m-d') . ".csv";
+
+        $headers = [
+            'Content-Type' => 'text/csv; charset=UTF-8',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Pragma' => 'no-cache',
+            'Cache-Control' => 'must-revalidate, post-check=0, pre-check=0',
+            'Expires' => '0',
+        ];
+
+        $callback = function () use ($lamarans) {
+            $file = fopen('php://output', 'w');
+            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+
+            fputcsv($file, [
+                'No',
+                'Nama Pelamar',
+                'Email',
+                'No. Telepon / Kontak',
+                'Posisi Lowongan',
+                'Status Lamaran',
+                'Tanggal Melamar',
+                'Pendidikan Terakhir',
+                'Keahlian (Skills)',
+                'Portofolio Terlampir',
+            ]);
+
+            $no = 1;
+            foreach ($lamarans as $lamaran) {
+                $cv = $lamaran->cv;
+                $pendidikanTerakhir = '-';
+                if ($cv && $cv->pendidikans && $cv->pendidikans->count() > 0) {
+                    $lastP = $cv->pendidikans->last();
+                    $pendidikanTerakhir = trim("{$lastP->tingkat} {$lastP->jurusan} - {$lastP->universitas}");
+                }
+
+                $skills = '-';
+                if ($cv && $cv->skills && $cv->skills->count() > 0) {
+                    $skills = $cv->skills->pluck('skill')->implode(', ');
+                }
+
+                $portofolio = '-';
+                if ($lamaran->portofolio) {
+                    $portofolio = $lamaran->portofolio->judul;
+                }
+
+                fputcsv($file, [
+                    $no++,
+                    $lamaran->pelamar->nama_lengkap ?? '-',
+                    $lamaran->pelamar->email ?? '-',
+                    $cv->kontak ?? ($lamaran->pelamar->no_telp ?? '-'),
+                    $lamaran->lowongan->posisi_pekerjaan ?? '-',
+                    ucfirst($lamaran->status),
+                    $lamaran->created_at ? $lamaran->created_at->format('d/m/Y H:i') : '-',
+                    $pendidikanTerakhir,
+                    $skills,
+                    $portofolio,
+                ]);
+            }
+
+            fclose($file);
+        };
+
+        return response()->stream($callback, 200, $headers);
+    }
 }

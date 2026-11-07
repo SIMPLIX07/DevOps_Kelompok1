@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Cv;
 use App\Models\Pelamar;
+use App\Models\Lamaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 
 class CVController extends Controller
@@ -274,5 +277,42 @@ class CVController extends Controller
                 'error' => 'Gagal menghapus CV'
             ]);
         }
+    }
+
+    /**
+     * Export CV to PDF format.
+     */
+    public function exportPdf($id)
+    {
+        $pelamarId = session('pelamar_id');
+        $perusahaanId = session('perusahaan_id');
+        $admin = session('admin_id') ?? session('admin_logged_in');
+
+        if (!$pelamarId && !$perusahaanId && !$admin) {
+            return redirect('/login/pelamar')->withErrors('Silakan login terlebih dahulu.');
+        }
+
+        $cv = Cv::with(['pelamar.portofolios', 'pendidikans', 'skills', 'pengalamans'])
+            ->findOrFail($id);
+
+        if ($pelamarId && !$perusahaanId && !$admin && $cv->pelamar_id != $pelamarId) {
+            abort(403, 'Akses tidak diizinkan.');
+        }
+
+        $lamaranId = request('lamaran_id');
+        $attachedPortfolio = null;
+
+        if ($lamaranId) {
+            $lamaran = Lamaran::with('portofolio')->find($lamaranId);
+            if ($lamaran && $lamaran->portofolio) {
+                $attachedPortfolio = $lamaran->portofolio;
+            }
+        }
+
+        $pdf = Pdf::loadView('cv.pdf', compact('cv', 'attachedPortfolio'))
+            ->setPaper('a4', 'portrait');
+
+        $safeName = Str::slug($cv->pelamar->nama_lengkap ?? 'Pelamar');
+        return $pdf->download("CV-{$safeName}.pdf");
     }
 }

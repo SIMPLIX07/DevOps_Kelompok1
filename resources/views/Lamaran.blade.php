@@ -260,6 +260,20 @@
 
     <main
         class="flex-grow flex flex-col items-center px-margin-mobile md:px-margin-desktop py-xl max-w-7xl mx-auto w-full">
+
+        @if (session('success'))
+            <div class="mb-6 w-full max-w-7xl p-4 bg-secondary-container/30 border border-secondary text-on-secondary-container rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined text-secondary">check_circle</span>
+                <span class="font-body-sm font-semibold">{{ session('success') }}</span>
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="mb-6 w-full max-w-7xl p-4 bg-error-container/30 border border-error text-on-error-container rounded-xl flex items-center gap-3">
+                <span class="material-symbols-outlined text-error">error</span>
+                <span class="font-body-sm font-semibold">{{ session('error') }}</span>
+            </div>
+        @endif
+
         <div
             class="bg-surface-container-lowest p-xs rounded-full shadow-sm mb-xl inline-flex border border-surface-variant flex-wrap justify-center gap-2">
             <button
@@ -327,13 +341,25 @@
                             @endif
                         </p>
 
-                        <div class="flex justify-between items-center gap-4 flex-wrap">
+                        <div class="flex justify-between items-center gap-2 flex-wrap pt-2 border-t border-outline-variant/30">
                             <span class="text-body-sm text-outline">Dilamar pada
                                 {{ optional($lamaran->created_at)->format('d M Y') }}</span>
-                            <a href="{{ route('lowongan.detail', $lamaran->lowongan->id) }}"
-                                class="py-2.5 px-4 border border-primary text-primary hover:bg-primary-container/10 rounded-lg text-label-md transition-colors">
-                                Lihat Detail
-                            </a>
+                            <div class="flex items-center gap-2">
+                                @if ($lamaran->status === 'diproses' || $lamaran->status === 'wawancara')
+                                    <form action="{{ route('lamaran.batalkan', $lamaran->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin membatalkan lamaran pekerjaan ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="py-2 px-3 bg-error/10 hover:bg-error text-error hover:text-white rounded-lg text-label-sm font-semibold transition-colors flex items-center gap-1" title="Batalkan Lamaran">
+                                            <span class="material-symbols-outlined text-[16px]">cancel</span>
+                                            Batalkan
+                                        </button>
+                                    </form>
+                                @endif
+                                <a href="{{ route('lowongan.detail', $lamaran->lowongan->id) }}"
+                                    class="py-2 px-3 border border-primary text-primary hover:bg-primary-container/10 rounded-lg text-label-sm transition-colors">
+                                    Lihat Detail
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </article>

@@ -376,4 +376,102 @@ class CvTest extends TestCase
         $response->assertSee('Portofolio Terlampir');
         $response->assertSee('Sistem Reservasi Online');
     }
+
+    /**
+     * Menguji ekspor CV ke format PDF oleh pemilik CV.
+     */
+    public function test_export_cv_pdf_success_as_owner()
+    {
+        $cv = Cv::create([
+            'pelamar_id'   => $this->pelamar->id,
+            'umur'         => 24,
+            'tentang_saya' => 'Seorang developer berdedikasi.',
+            'kontak'       => '081298765432',
+            'title'        => 'Backend Engineer',
+            'subtitle'     => 'Resume',
+        ]);
+
+        $cv->pendidikans()->create([
+            'tingkat' => 'S1',
+            'universitas' => 'Telkom University',
+            'jurusan' => 'Informatika',
+        ]);
+
+        $cv->skills()->create([
+            'skill' => 'PHP',
+            'kemampuan' => 90,
+        ]);
+
+        $response = $this->withSession(['pelamar_id' => $this->pelamar->id])
+            ->get('/cv/' . $cv->id . '/export-pdf');
+
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/pdf');
+    }
+
+    /**
+     * Menguji ekspor CV PDF gagal jika belum login.
+     */
+    public function test_export_cv_pdf_unauthorized_when_not_logged_in()
+    {
+        $cv = Cv::create([
+            'pelamar_id'   => $this->pelamar->id,
+            'umur'         => 24,
+            'tentang_saya' => 'Deskripsi',
+            'kontak'       => '0812',
+            'title'        => 'CV',
+            'subtitle'     => 'Resume',
+        ]);
+
+        $response = $this->get('/cv/' . $cv->id . '/export-pdf');
+        $response->assertRedirect('/login/pelamar');
+    }
+
+    /**
+     * Menguji pelamar lain tidak bisa mengekspor CV yang bukan miliknya.
+     */
+    public function test_export_cv_pdf_forbidden_for_other_pelamar()
+    {
+        $cv = Cv::create([
+            'pelamar_id'   => $this->pelamar->id,
+            'umur'         => 24,
+            'tentang_saya' => 'Deskripsi',
+            'kontak'       => '0812',
+            'title'        => 'CV',
+            'subtitle'     => 'Resume',
+        ]);
+
+        $otherPelamar = Pelamar::create([
+            'nama_lengkap' => 'Pelamar Lain',
+            'username'     => 'pelamarlain',
+            'email'        => 'lain@mail.com',
+            'password'     => bcrypt('password123'),
+        ]);
+
+        $response = $this->withSession(['pelamar_id' => $otherPelamar->id])
+            ->get('/cv/' . $cv->id . '/export-pdf');
+
+        $response->assertStatus(403);
+    }
+
+    /**
+     * Menguji perusahaan dapat mengekspor CV pelamar.
+     */
+    public function test_export_cv_pdf_success_as_perusahaan()
+    {
+        $cv = Cv::create([
+            'pelamar_id'   => $this->pelamar->id,
+            'umur'         => 24,
+            'tentang_saya' => 'Deskripsi',
+            'kontak'       => '0812',
+            'title'        => 'CV',
+            'subtitle'     => 'Resume',
+        ]);
+
+        $response = $this->withSession(['perusahaan_id' => 99])
+            ->get('/cv/' . $cv->id . '/export-pdf');
+
+        $response->assertStatus(200);
+        $response->assertHeader('content-type', 'application/pdf');
+    }
 }
