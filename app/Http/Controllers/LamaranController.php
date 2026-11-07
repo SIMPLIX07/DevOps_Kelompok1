@@ -56,11 +56,16 @@ class LamaranController extends Controller
 
         return back()->with('success', 'Lamaran berhasil diterima.');
     }
-    public function tolak($id)
+    public function tolak(Request $request, $id)
     {
+        $request->validate([
+            'alasan_penolakan' => 'nullable|string|max:500',
+        ]);
+
         $lamaran = Lamaran::findOrFail($id);
         $lamaran->update([
-            'status' => 'ditolak'
+            'status' => 'ditolak',
+            'alasan_penolakan' => $request->input('alasan_penolakan'),
         ]);
 
         return back()->with('success', 'Lamaran pelamar ini telah ditolak.');

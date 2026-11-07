@@ -455,6 +455,10 @@
                     <h4 class="font-headline text-xl font-bold text-on-surface">Tolak Lamaran</h4>
                     <p class="mt-2 text-body-sm text-on-surface-variant" id="confirmDialogText">Apakah Anda yakin ingin menolak lamaran pelamar ini?</p>
                 </div>
+                <div class="mt-2 text-left w-full">
+                    <label for="rejectReasonInput" class="block text-xs font-semibold text-on-surface-variant mb-1">Alasan Penolakan (Opsional):</label>
+                    <textarea id="rejectReasonInput" rows="2" maxlength="500" placeholder="Contoh: Kualifikasi belum sesuai dengan kebutuhan..." class="w-full px-3 py-2 text-xs border border-outline-variant rounded-lg focus:ring-1 focus:ring-error outline-none bg-surface-container-lowest text-on-surface"></textarea>
+                </div>
             </div>
             <div class="mt-6 flex gap-3">
                 <button id="confirmDialogCancel" type="button" class="flex-1 py-3 bg-surface-variant text-on-surface rounded-xl font-semibold hover:bg-surface-container transition-all active:scale-95">Batal</button>
@@ -468,6 +472,8 @@
         function openRejectModal(lamaranId, namaPelamar) {
             activeFormId = `reject-form-${lamaranId}`;
             document.getElementById('confirmDialogText').textContent = `Apakah Anda yakin ingin menolak lamaran dari ${namaPelamar}?`;
+            const reasonInput = document.getElementById('rejectReasonInput');
+            if (reasonInput) reasonInput.value = '';
             const confirmDialog = document.getElementById('confirmDialog');
             confirmDialog.classList.remove('hidden');
             confirmDialog.classList.add('flex');
@@ -495,7 +501,19 @@
             if (confirmDialogBtn) {
                 confirmDialogBtn.addEventListener('click', () => {
                     if (activeFormId) {
-                        document.getElementById(activeFormId).submit();
+                        const form = document.getElementById(activeFormId);
+                        const reasonInput = document.getElementById('rejectReasonInput');
+                        if (form && reasonInput) {
+                            let hiddenInput = form.querySelector('input[name="alasan_penolakan"]');
+                            if (!hiddenInput) {
+                                hiddenInput = document.createElement('input');
+                                hiddenInput.type = 'hidden';
+                                hiddenInput.name = 'alasan_penolakan';
+                                form.appendChild(hiddenInput);
+                            }
+                            hiddenInput.value = reasonInput.value;
+                        }
+                        form.submit();
                     }
                 });
             }
