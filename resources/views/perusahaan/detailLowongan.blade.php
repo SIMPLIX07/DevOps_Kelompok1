@@ -184,7 +184,11 @@
                 </div>
 
                 <!-- Actions buttons in hero -->
-                <div class="w-full md:w-auto mt-2 md:mt-0 flex gap-3 justify-start md:justify-end">
+                <div class="w-full md:w-auto mt-2 md:mt-0 flex flex-wrap gap-3 justify-start md:justify-end">
+                    <a href="{{ route('perusahaan.lowongan.exportCsv', $lowongan->id) }}" class="button action-button bg-surface-container-lowest text-primary hover:bg-surface-container-low font-semibold text-[14px] px-5 py-3 rounded-lg flex items-center gap-2 shadow-sm border border-outline-variant">
+                        <span class="material-symbols-outlined text-[20px]">file_download</span>
+                        Rekap CSV
+                    </a>
                     <a href="{{ route('lowongan.edit', $lowongan->id) }}" class="button action-button bg-secondary hover:bg-opacity-95 text-white font-semibold text-[14px] px-6 py-3 rounded-lg flex items-center gap-2 shadow-sm">
                         <span class="material-symbols-outlined text-[20px]">edit</span>
                         Edit Lowongan
@@ -322,10 +326,18 @@
 
                 <!-- List Pelamar (Employer Side Only) -->
                 <div class="bg-surface-container-lowest border border-surface-variant rounded-xl p-6 glass-panel space-y-4">
-                    <h3 class="text-[20px] font-headline font-bold text-on-surface flex items-center gap-2 border-b border-surface-container pb-3">
-                        <span class="material-symbols-outlined text-secondary">group</span>
-                        Pelamar ({{ $lowongan->lamarans->where('status', 'diproses')->count() }})
-                    </h3>
+                    <div class="flex items-center justify-between border-b border-surface-container pb-3">
+                        <h3 class="text-[20px] font-headline font-bold text-on-surface flex items-center gap-2">
+                            <span class="material-symbols-outlined text-secondary">group</span>
+                            Pelamar ({{ $lowongan->lamarans->where('status', 'diproses')->count() }})
+                        </h3>
+                        @if($lowongan->lamarans->count() > 0)
+                        <a href="{{ route('perusahaan.lowongan.exportCsv', $lowongan->id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-secondary/10 hover:bg-secondary text-secondary hover:text-white transition-all shadow-sm" title="Download Rekap Pelamar (CSV)">
+                            <span class="material-symbols-outlined text-[16px]">file_download</span>
+                            Rekap CSV
+                        </a>
+                        @endif
+                    </div>
                     
                     <div class="space-y-4 max-h-[400px] overflow-y-auto pr-1">
                         @forelse($lowongan->lamarans->where('status', 'diproses') as $lamaran)

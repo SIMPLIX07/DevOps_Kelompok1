@@ -11,6 +11,15 @@
         <testsuite name="Feature">
             <directory>tests/Feature</directory>
         </testsuite>
+        <testsuite name="ExportCvPdf">
+            <directory>tests/ExportCvPdf</directory>
+        </testsuite>
+        <testsuite name="BatalkanLamaran">
+            <directory>tests/BatalkanLamaran</directory>
+        </testsuite>
+        <testsuite name="RekapPelamarCsv">
+            <directory>tests/RekapPelamarCsv</directory>
+        </testsuite>
     </testsuites>
     <source>
         <include>

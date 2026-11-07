@@ -87,6 +87,8 @@ Route::post('/auth/firebase/google', [PelamarController::class, 'firebaseGoogleL
 Route::get('/pelamar/cv', [LamaranController::class, 'getCvPelamar']);
 Route::get('/pelamar/portofolio', [LamaranController::class, 'getPortofolioPelamar']);
 Route::post('/lamaran/insert', [LamaranController::class, 'insertLamaran']);
+Route::delete('/lamaran/{id}/batalkan', [LamaranController::class, 'batalkan'])->name('lamaran.batalkan');
+Route::post('/lamaran/{id}/batalkan', [LamaranController::class, 'batalkan']);
 
 // Setting Pelamar
 Route::get('/pelamar/setting', [PelamarController::class, 'settings'])->name('pelamar.settings');
@@ -102,6 +104,7 @@ Route::prefix('lowongan')->group(function () {
 
     // Detail Lowongan Perusahan
     Route::get('/detail/{id}', [LowonganController::class, 'showDetail'])->name('perusahaan.lowongan.detail');
+    Route::get('/{id}/export-csv', [LowonganController::class, 'exportPelamarCsv'])->name('perusahaan.lowongan.exportCsv');
     Route::delete('/delete/{id}', [LowonganController::class, 'destroy'])->name('perusahaan.lowongan.delete');
     Route::get('/edit/{id}', [LowonganController::class, 'edit'])->name('lowongan.edit');
     Route::put('/update/{id}', [LowonganController::class, 'update'])->name('lowongan.update');
@@ -117,6 +120,7 @@ Route::post('/lamaran/terima/{id}', [PerusahaanController::class, 'terimaPelamar
 Route::get('/karyawanPerusahaan', [PerusahaanController::class, 'kategoriKaryawan']);
 
 // CV
+Route::get('/cv/{id}/export-pdf', [CVController::class, 'exportPdf'])->name('cv.exportPdf');
 Route::resource('/cv', CVController::class);
 Route::get('/cv/detail/{id}', [CVController::class, 'show'])->name('cv.show');
 
@@ -150,6 +154,8 @@ Route::get('/perusahaan/wawancara', [WawancaraController::class, 'indexPerusahaa
 // History lamaran perusahaan
 Route::get('/perusahaan/history', [LamaranController::class, 'historyPerusahaan'])
     ->name('perusahaan.history');
+Route::get('/perusahaan/rekap-pelamar/csv', [LamaranController::class, 'exportPelamarCsv'])
+    ->name('perusahaan.rekapPelamarCsv');
 
 Route::post(
     '/perusahaan/wawancara/{id}/terima',

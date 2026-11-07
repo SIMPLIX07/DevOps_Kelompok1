@@ -134,6 +134,11 @@
         </nav>
         @endif
         <div class="flex items-center gap-4">
+            <a href="{{ route('cv.exportPdf', ['id' => $cv->id, 'lamaran_id' => request('lamaran_id')]) }}" 
+               class="bg-secondary hover:opacity-90 text-white text-xs font-semibold px-4 py-2 rounded-lg flex items-center gap-1.5 shadow-sm transition-all !no-underline">
+                <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>
+                Export PDF
+            </a>
         </div>
     </div>
 </nav>
@@ -163,6 +168,11 @@
                     <span class="bg-white/10 backdrop-blur-md px-md py-base rounded-full border border-white/20 flex items-center gap-xs">
                         <span class="material-symbols-outlined text-sm">calendar_today</span> {{ $cv->umur }} Tahun
                     </span>
+                    <a href="{{ route('cv.exportPdf', ['id' => $cv->id, 'lamaran_id' => request('lamaran_id')]) }}" 
+                       class="bg-secondary hover:bg-secondary/90 text-white font-semibold px-md py-base rounded-full border border-secondary flex items-center gap-xs shadow-md transition-all active:scale-95 !no-underline"
+                       title="Download CV dalam format PDF">
+                        <span class="material-symbols-outlined text-sm">picture_as_pdf</span> Export PDF
+                    </a>
                 </div>
             </div>
         </div>

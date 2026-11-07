@@ -8,6 +8,7 @@ use App\Models\Perusahaan;
 use App\Models\Bookmark;
 use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
+use App\Services\PelamarCsvExporter;
 
 class LowonganController extends Controller
 {
@@ -323,5 +324,30 @@ class LowonganController extends Controller
         }
 
         return view('home', compact('lowongans', 'lokasiOptions', 'bookmarkedIds', 'acceptedLamaran'));
+    }
+
+    /**
+     * Rekap pelamar pada lowongan spesifik ke file CSV.
+     */
+    public function exportPelamarCsv($id)
+    {
+        $perusahaanId = session('perusahaan_id');
+        if (!$perusahaanId) {
+            return redirect('/login/perusahaan')->withErrors('Silakan login sebagai perusahaan.');
+        }
+
+        $lowongan = Lowongan::where('id', $id)
+            ->where('perusahaan_id', $perusahaanId)
+            ->firstOrFail();
+
+        $lamarans = \App\Models\Lamaran::with(['pelamar', 'cv.pendidikans', 'cv.skills', 'portofolio'])
+            ->where('lowongan_id', $id)
+            ->latest()
+            ->get();
+
+        $safePosisi = \Illuminate\Support\Str::slug($lowongan->posisi_pekerjaan);
+        $filename = "rekap-pelamar-{$safePosisi}-" . date('Y-m-d') . ".csv";
+
+        return (new PelamarCsvExporter())->download($lamarans, $filename);
     }
 }

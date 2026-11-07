@@ -358,4 +358,129 @@ class LamaranTest extends TestCase
             ->get('/home-pelamar');
         $response2->assertViewHas('acceptedLamaran', null);
     }
+
+    /**
+     * Menguji pelamar berhasil membatalkan lamaran yang berstatus diproses.
+     */
+    public function test_batalkan_lamaran_success()
+    {
+        $lamaran = Lamaran::create([
+            'pelamar_id' => $this->pelamar->id,
+            'lowongan_id' => $this->lowongan->id,
+            'cv_id' => $this->cv->id,
+            'status' => 'diproses',
+        ]);
+
+        $response = $this->withSession(['pelamar_id' => $this->pelamar->id])
+            ->delete('/lamaran/' . $lamaran->id . '/batalkan');
+
+        $response->assertRedirect();
+        $response->assertSessionHas('success', 'Lamaran berhasil dibatalkan.');
+        $this->assertDatabaseMissing('lamarans', ['id' => $lamaran->id]);
+    }
+
+    /**
+     * Menguji batalkan lamaran via JSON request.
+     */
+    public function test_batalkan_lamaran_json_request()
+    {
+        $lamaran = Lamaran::create([
+            'pelamar_id' => $this->pelamar->id,
+            'lowongan_id' => $this->lowongan->id,
+            'cv_id' => $this->cv->id,
+            'status' => 'diproses',
+        ]);
+
+        $response = $this->withSession(['pelamar_id' => $this->pelamar->id])
+            ->deleteJson('/lamaran/' . $lamaran->id . '/batalkan');
+
+        $response->assertStatus(200);
+        $response->assertJson(['message' => 'Lamaran berhasil dibatalkan.']);
+        $this->assertDatabaseMissing('lamarans', ['id' => $lamaran->id]);
+    }
+
+    /**
+     * Menguji batalkan lamaran gagal jika belum login.
+     */
+    public function test_batalkan_lamaran_unauthorized()
+    {
+        $lamaran = Lamaran::create([
+            'pelamar_id' => $this->pelamar->id,
+            'lowongan_id' => $this->lowongan->id,
+            'cv_id' => $this->cv->id,
+            'status' => 'diproses',
+        ]);
+
+        $response = $this->delete('/lamaran/' . $lamaran->id . '/batalkan');
+        $response->assertRedirect('/login/pelamar');
+    }
+
+    /**
+     * Menguji lamaran yang sudah diterima tidak dapat dibatalkan.
+     */
+    public function test_batalkan_lamaran_cannot_cancel_if_already_accepted()
+    {
+        $lamaran = Lamaran::create([
+            'pelamar_id' => $this->pelamar->id,
+            'lowongan_id' => $this->lowongan->id,
+            'cv_id' => $this->cv->id,
+            'status' => 'diterima',
+        ]);
+
+        $response = $this->withSession(['pelamar_id' => $this->pelamar->id])
+            ->delete('/lamaran/' . $lamaran->id . '/batalkan');
+
+        $response->assertSessionHas('error');
+        $this->assertDatabaseHas('lamarans', ['id' => $lamaran->id]);
+    }
+
+    /**
+     * Menguji perusahaan dapat mengekspor rekap pelamar per lowongan ke CSV.
+     */
+    public function test_export_pelamar_csv_by_lowongan_success()
+    {
+        Lamaran::create([
+            'pelamar_id' => $this->pelamar->id,
+            'lowongan_id' => $this->lowongan->id,
+            'cv_id' => $this->cv->id,
+            'status' => 'diproses',
+        ]);
+
+        $response = $this->withSession(['perusahaan_id' => $this->perusahaan->id])
+            ->get('/lowongan/' . $this->lowongan->id . '/export-csv');
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/csv', $response->headers->get('content-type'));
+    }
+
+    /**
+     * Menguji perusahaan dapat mengekspor rekap semua pelamar ke CSV.
+     */
+    public function test_export_all_pelamar_csv_success()
+    {
+        Lamaran::create([
+            'pelamar_id' => $this->pelamar->id,
+            'lowongan_id' => $this->lowongan->id,
+            'cv_id' => $this->cv->id,
+            'status' => 'diproses',
+        ]);
+
+        $response = $this->withSession(['perusahaan_id' => $this->perusahaan->id])
+            ->get('/perusahaan/rekap-pelamar/csv');
+
+        $response->assertStatus(200);
+        $this->assertStringContainsString('text/csv', $response->headers->get('content-type'));
+    }
+
+    /**
+     * Menguji ekspor CSV gagal jika belum login sebagai perusahaan.
+     */
+    public function test_export_pelamar_csv_unauthorized()
+    {
+        $response = $this->get('/lowongan/' . $this->lowongan->id . '/export-csv');
+        $response->assertRedirect('/login/perusahaan');
+
+        $response2 = $this->get('/perusahaan/rekap-pelamar/csv');
+        $response2->assertRedirect('/login/perusahaan');
+    }
 }
