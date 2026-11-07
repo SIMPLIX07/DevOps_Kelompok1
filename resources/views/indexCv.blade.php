@@ -223,6 +223,13 @@
                             </div>
 
                             <div class="flex items-center gap-sm" @click.stop>
+                                <a href="{{ route('cv.exportPdf', $cv->id) }}"
+                                    class="flex items-center justify-center gap-1 px-4 h-10 bg-primary-container text-white rounded-lg font-label-md shadow-md hover:opacity-90 transition-all active:scale-95 text-sm !no-underline"
+                                    title="Download CV PDF">
+                                    <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                                    PDF
+                                </a>
+
                                 <a href="{{ route('cv.edit', $cv->id) }}"
                                     class="flex items-center justify-center px-5 h-10 bg-secondary text-white rounded-lg font-label-md shadow-md hover:opacity-90 transition-all active:scale-95 text-sm !no-underline">
                                     Edit
@@ -337,11 +344,18 @@
                             </template>
                         </div>
 
-                        <!-- Close -->
-                        <button @click="closeAll()"
-                            class="w-full bg-secondary text-white py-3 rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all shadow-md shrink-0">
-                            Tutup
-                        </button>
+                        <!-- Actions -->
+                        <div class="flex gap-2 w-full mt-2">
+                            <a :href="'/cv/' + cv.id + '/export-pdf'"
+                                class="flex-1 bg-primary text-white py-3 rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all shadow-md shrink-0 text-center flex items-center justify-center gap-2 !no-underline">
+                                <span class="material-symbols-outlined text-[18px]">picture_as_pdf</span>
+                                Export PDF
+                            </a>
+                            <button @click="closeAll()"
+                                class="flex-1 bg-secondary text-white py-3 rounded-lg font-label-md hover:opacity-90 active:scale-95 transition-all shadow-md shrink-0">
+                                Tutup
+                            </button>
+                        </div>
                     </div>
                 </div>
 

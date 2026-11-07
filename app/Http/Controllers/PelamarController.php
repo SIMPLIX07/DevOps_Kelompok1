@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\Http;
 
 class PelamarController extends Controller
 {
+    private const LOGIN_ROUTE = '/login/pelamar';
+
     // REGISTER
     public function store(Request $request)
     {
@@ -81,7 +83,7 @@ class PelamarController extends Controller
         $pelamar = Pelamar::find(session('pelamar_id'));
 
         if (!$pelamar) {
-            return redirect('/login/pelamar');
+            return redirect(self::LOGIN_ROUTE);
         }
 
         if (!Hash::check($request->password_lama, $pelamar->password)) {
@@ -96,67 +98,59 @@ class PelamarController extends Controller
         return back()->with('success_password', 'Password berhasil diperbarui');
     }
 
-
-
-    public function login(Request $request)
+    private function createPelamarSession(Pelamar $pelamar): void
     {
-        // Fallback to traditional local database login if Firebase idToken is not provided (legacy/old users)
-        if (!$request->has('idToken')) {
-            $request->validate([
-                'username' => 'required',
-                'password' => 'required',
-            ]);
+        session([
+            'pelamar_id'       => $pelamar->id,
+            'pelamar_username' => $pelamar->username,
+            'pelamar_nama'     => $pelamar->nama_lengkap,
+            'pelamar_foto'     => $pelamar->foto_profil,
+        ]);
+    }
 
-            // Find applicant by email or username
-            $pelamar = Pelamar::where('username', $request->username)
-                              ->orWhere('email', $request->username)
-                              ->first();
-
-            if (!$pelamar || !Hash::check($request->password, $pelamar->password)) {
-                return back()->withErrors([
-                    'login' => 'Username/email atau password salah.'
-                ])->withInput();
-            }
-
-            session([
-                'pelamar_id'       => $pelamar->id,
-                'pelamar_username' => $pelamar->username,
-                'pelamar_nama'     => $pelamar->nama_lengkap,
-                'pelamar_foto'     => $pelamar->foto_profil,
-            ]);
-
-            return redirect()->route('home');
-        }
-
+    private function loginLocal(Request $request)
+    {
         $request->validate([
             'username' => 'required',
-            'idToken' => 'required',
+            'password' => 'required',
+        ]);
+
+        $pelamar = Pelamar::where('username', $request->username)
+                          ->orWhere('email', $request->username)
+                          ->first();
+
+        if (!$pelamar || !Hash::check($request->password, $pelamar->password)) {
+            return back()->withErrors([
+                'login' => 'Username/email atau password salah.'
+            ])->withInput();
+        }
+
+        $this->createPelamarSession($pelamar);
+
+        return redirect()->route('home');
+    }
+
+    private function loginFirebase(Request $request)
+    {
+        $request->validate([
+            'username'     => 'required',
+            'idToken'      => 'required',
             'firebase_uid' => 'required',
         ]);
 
-        // Verify ID Token with Google Firebase API
         $apiKey = config('services.firebase.api_key');
         $response = Http::post("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={$apiKey}", [
             'idToken' => $request->idToken
         ]);
 
-        if ($response->failed() || empty($response->json('users'))) {
+        $users = $response->json('users');
+        if ($response->failed() || empty($users) || $users[0]['localId'] !== $request->firebase_uid) {
             return back()->withErrors([
-                'login' => 'Verifikasi Firebase Auth gagal.'
+                'login' => 'Verifikasi Firebase Auth gagal atau identitas tidak cocok.'
             ])->withInput();
         }
 
-        $firebaseUser = $response->json('users')[0];
-        $firebaseUid = $firebaseUser['localId'];
-
-        if ($firebaseUid !== $request->firebase_uid) {
-            return back()->withErrors([
-                'login' => 'Identitas Firebase tidak cocok.'
-            ])->withInput();
-        }
-
-        // Cari pelamar berdasarkan email atau username
-        $pelamar = Pelamar::where('email', $firebaseUser['email'])
+        $pelamar = Pelamar::where('email', $users[0]['email'])
                           ->orWhere('username', $request->username)
                           ->first();
 
@@ -166,20 +160,23 @@ class PelamarController extends Controller
             ])->withInput();
         }
 
-        // Sinkronisasi firebase_uid jika belum ada
         if (!$pelamar->firebase_uid) {
-            $pelamar->firebase_uid = $firebaseUid;
+            $pelamar->firebase_uid = $users[0]['localId'];
             $pelamar->save();
         }
 
-        session([
-            'pelamar_id'       => $pelamar->id,
-            'pelamar_username' => $pelamar->username,
-            'pelamar_nama'     => $pelamar->nama_lengkap,
-            'pelamar_foto'     => $pelamar->foto_profil,
-        ]);
+        $this->createPelamarSession($pelamar);
 
         return redirect()->route('home');
+    }
+
+    public function login(Request $request)
+    {
+        if (!$request->has('idToken')) {
+            return $this->loginLocal($request);
+        }
+
+        return $this->loginFirebase($request);
     }
 
     public function validateSignup(Request $request)
@@ -232,100 +229,107 @@ class PelamarController extends Controller
             'keahlian' => 'nullable'
         ]);
 
-        $apiKey = config('services.firebase.api_key');
-        $response = Http::post("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={$apiKey}", [
-            'idToken' => $request->idToken
-        ]);
-
-        if ($response->failed() || empty($response->json('users'))) {
+        $firebaseUser = $this->verifyFirebaseToken((string) $request->idToken);
+        if (!$firebaseUser) {
             return response()->json([
                 'success' => false,
                 'message' => 'Verifikasi token Google gagal.'
             ], 401);
         }
 
-        $firebaseUser = $response->json('users')[0];
-        $firebaseUid = $firebaseUser['localId'];
-        $email = $firebaseUser['email'];
-
-        if ($firebaseUid !== $request->firebase_uid) {
+        if ($firebaseUser['localId'] !== $request->firebase_uid) {
             return response()->json([
                 'success' => false,
                 'message' => 'Identitas Google tidak cocok.'
             ], 401);
         }
 
-        // Cari berdasarkan firebase_uid atau email
-        $pelamar = Pelamar::where('firebase_uid', $firebaseUid)->first();
-
-        if (!$pelamar) {
-            $pelamar = Pelamar::where('email', $email)->first();
-            if ($pelamar) {
-                $pelamar->firebase_uid = $firebaseUid;
-                if ($request->no_telp) {
-                    $pelamar->no_telp = $request->no_telp;
-                }
-                $pelamar->save();
-
-                // Simpan keahlian pelamar jika ada
-                if ($request->keahlian) {
-                    Keahlian::where('pelamar_id', $pelamar->id)->delete();
-                    $skills = array_map('trim', explode(',', $request->keahlian));
-                    foreach ($skills as $skill) {
-                        if (!empty($skill)) {
-                            Keahlian::create([
-                                'pelamar_id'    => $pelamar->id,
-                                'nama_keahlian' => $skill
-                            ]);
-                        }
-                    }
-                }
-            } else {
-                // Buat akun baru
-                $baseUsername = explode('@', $email)[0];
-                $username = $baseUsername;
-                $counter = 1;
-                while (Pelamar::where('username', $username)->exists()) {
-                    $username = $baseUsername . $counter;
-                    $counter++;
-                }
-
-                $pelamar = Pelamar::create([
-                    'nama_lengkap' => $request->nama_lengkap,
-                    'username'     => $username,
-                    'email'        => $email,
-                    'firebase_uid' => $firebaseUid,
-                    'password'     => Hash::make(Str::random(16)),
-                    'foto_profil'  => null,
-                    'no_telp'      => $request->no_telp
-                ]);
-
-                // Simpan keahlian pelamar
-                if ($request->keahlian) {
-                    $skills = array_map('trim', explode(',', $request->keahlian));
-                    foreach ($skills as $skill) {
-                        if (!empty($skill)) {
-                            Keahlian::create([
-                                'pelamar_id'    => $pelamar->id,
-                                'nama_keahlian' => $skill
-                            ]);
-                        }
-                    }
-                }
-            }
-        }
-
-        session([
-            'pelamar_id'       => $pelamar->id,
-            'pelamar_username' => $pelamar->username,
-            'pelamar_nama'     => $pelamar->nama_lengkap,
-            'pelamar_foto'     => $pelamar->foto_profil,
-        ]);
+        $pelamar = $this->resolveFirebasePelamar($firebaseUser, $request);
+        $this->createPelamarSession($pelamar);
 
         return response()->json([
             'success' => true,
             'redirect' => route('home')
         ]);
+    }
+
+    private function verifyFirebaseToken(string $idToken): ?array
+    {
+        $apiKey = config('services.firebase.api_key');
+        $response = Http::post("https://identitytoolkit.googleapis.com/v1/accounts:lookup?key={$apiKey}", [
+            'idToken' => $idToken
+        ]);
+
+        if ($response->failed() || empty($response->json('users'))) {
+            return null;
+        }
+
+        return $response->json('users')[0];
+    }
+
+    private function resolveFirebasePelamar(array $firebaseUser, Request $request): Pelamar
+    {
+        $firebaseUid = $firebaseUser['localId'];
+        $email = $firebaseUser['email'];
+
+        $pelamar = Pelamar::where('firebase_uid', $firebaseUid)->first();
+        if ($pelamar) {
+            return $pelamar;
+        }
+
+        $existingByEmail = Pelamar::where('email', $email)->first();
+        if ($existingByEmail) {
+            $existingByEmail->firebase_uid = $firebaseUid;
+            if ($request->no_telp) {
+                $existingByEmail->no_telp = $request->no_telp;
+            }
+            $existingByEmail->save();
+            $this->syncPelamarKeahlian($existingByEmail->id, $request->keahlian);
+            return $existingByEmail;
+        }
+
+        $newPelamar = Pelamar::create([
+            'nama_lengkap' => $request->nama_lengkap,
+            'username'     => $this->generateUniqueUsername($email),
+            'email'        => $email,
+            'firebase_uid' => $firebaseUid,
+            'password'     => Hash::make(Str::random(16)),
+            'foto_profil'  => null,
+            'no_telp'      => $request->no_telp
+        ]);
+
+        $this->syncPelamarKeahlian($newPelamar->id, $request->keahlian);
+        return $newPelamar;
+    }
+
+    private function generateUniqueUsername(string $email): string
+    {
+        $baseUsername = explode('@', $email)[0];
+        $username = $baseUsername;
+        $counter = 1;
+        while (Pelamar::where('username', $username)->exists()) {
+            $username = $baseUsername . $counter;
+            $counter++;
+        }
+        return $username;
+    }
+
+    private function syncPelamarKeahlian(int $pelamarId, ?string $keahlian): void
+    {
+        if (!$keahlian) {
+            return;
+        }
+
+        Keahlian::where('pelamar_id', $pelamarId)->delete();
+        $skills = array_map('trim', explode(',', $keahlian));
+        foreach ($skills as $skill) {
+            if (!empty($skill)) {
+                Keahlian::create([
+                    'pelamar_id'    => $pelamarId,
+                    'nama_keahlian' => $skill
+                ]);
+            }
+        }
     }
 
     //setting
@@ -334,7 +338,7 @@ class PelamarController extends Controller
         $pelamar = Pelamar::with('keahlians')->find(session('pelamar_id'));
 
         if (!$pelamar) {
-            return redirect('/login/pelamar');
+            return redirect(self::LOGIN_ROUTE);
         }
 
         $keahlianString = $pelamar->keahlians->pluck('nama_keahlian')->implode(', ');
@@ -408,7 +412,7 @@ class PelamarController extends Controller
         $pelamarId = session('pelamar_id');
 
         if (!$pelamarId) {
-            return redirect('/login/pelamar');
+            return redirect(self::LOGIN_ROUTE);
         }
         Keahlian::where('pelamar_id', $pelamarId)->delete();
         Karyawan::where('id_pelamar', $pelamarId)->delete();

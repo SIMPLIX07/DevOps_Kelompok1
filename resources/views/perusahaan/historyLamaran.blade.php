@@ -206,8 +206,9 @@
 
         <!-- Content Section -->
         <div class="max-w-7xl mx-auto px-margin-desktop pb-xl">
-            <!-- Filter Tabs -->
-            <div class="flex justify-center mb-xl mt-xl">
+            <!-- Filter Tabs & Export -->
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-xl mt-xl">
+                <div class="hidden sm:block w-36"></div>
                 <div class="bg-surface-container-high p-base rounded-full flex gap-base shadow-md">
                     <button class="tab-btn px-xl py-xs rounded-full bg-primary-container text-on-primary-container font-label-md text-label-md transition-all" data-tab="diterima">
                         Diterima
@@ -215,6 +216,12 @@
                     <button class="tab-btn px-xl py-xs rounded-full text-on-surface-variant hover:bg-surface-container-low font-label-md text-label-md transition-all" data-tab="ditolak">
                         Ditolak
                     </button>
+                </div>
+                <div>
+                    <a href="{{ route('perusahaan.rekapPelamarCsv') }}" class="flex items-center gap-1.5 px-4 py-2 bg-secondary text-white rounded-lg text-label-md font-semibold hover:opacity-90 transition-all shadow-sm active:scale-95 text-decoration-none">
+                        <span class="material-symbols-outlined text-[18px]">file_download</span>
+                        <span>Rekap CSV</span>
+                    </a>
                 </div>
             </div>
 

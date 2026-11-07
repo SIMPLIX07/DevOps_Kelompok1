@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Lamaran;
 use App\Models\Cv;
 use App\Models\Wawancara;
+use App\Services\PelamarCsvExporter;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -99,7 +100,7 @@ class LamaranController extends Controller
         return view('Lamaran', compact('lamarans'));
     }
 
-    public function historyPerusahaan(Request $request)
+    public function historyPerusahaan()
     {
         $perusahaanId = session('perusahaan_id');
 
@@ -175,5 +176,72 @@ class LamaranController extends Controller
         }
 
         return back()->with('success', 'Undangan wawancara berhasil dikirim.');
+    }
+
+    /**
+     * Pelamar membatalkan lamaran pekerjaan.
+     */
+    public function batalkan($id)
+    {
+        $pelamarId = session('pelamar_id');
+
+        if (!$pelamarId) {
+            if (request()->expectsJson()) {
+                return response()->json(['message' => 'Silakan login terlebih dahulu.'], 401);
+            }
+            return redirect('/login/pelamar')->withErrors('Silakan login terlebih dahulu.');
+        }
+
+        $lamaran = Lamaran::where('id', $id)
+            ->where('pelamar_id', $pelamarId)
+            ->firstOrFail();
+
+        if ($lamaran->status === 'diterima') {
+            if (request()->expectsJson()) {
+                return response()->json(['message' => 'Lamaran yang sudah diterima tidak dapat dibatalkan.'], 400);
+            }
+            return back()->with('error', 'Lamaran yang sudah diterima tidak dapat dibatalkan.');
+        }
+
+        // Hapus juga wawancara terkait jika ada
+        Wawancara::where('pelamar_id', $pelamarId)
+            ->where('lowongan_id', $lamaran->lowongan_id)
+            ->delete();
+
+        $lamaran->delete();
+
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Lamaran berhasil dibatalkan.']);
+        }
+
+        return back()->with('success', 'Lamaran berhasil dibatalkan.');
+    }
+
+    /**
+     * Rekap semua pelamar perusahaan ke file CSV.
+     */
+    public function exportPelamarCsv(Request $request)
+    {
+        $perusahaanId = session('perusahaan_id');
+
+        if (!$perusahaanId) {
+            return redirect('/login/perusahaan')->withErrors('Silakan login sebagai perusahaan.');
+        }
+
+        $statusFilter = $request->query('status');
+
+        $query = Lamaran::with(['pelamar', 'lowongan', 'cv.pendidikans', 'cv.skills', 'portofolio'])
+            ->whereHas('lowongan', function ($q) use ($perusahaanId) {
+                $q->where('perusahaan_id', $perusahaanId);
+            });
+
+        if ($statusFilter && in_array($statusFilter, ['diproses', 'wawancara', 'diterima', 'ditolak'])) {
+            $query->where('status', $statusFilter);
+        }
+
+        $lamarans = $query->latest()->get();
+        $filename = "rekap-pelamar-" . ($statusFilter ? "{$statusFilter}-" : "semua-") . date('Y-m-d') . ".csv";
+
+        return (new PelamarCsvExporter())->download($lamarans, $filename);
     }
 }
