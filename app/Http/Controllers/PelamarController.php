@@ -64,11 +64,32 @@ class PelamarController extends Controller
         return redirect()->route('home')->with('success', 'Registrasi berhasil!');
     }
 
+    public function keamanan()
+    {
+        $pelamarId = session('pelamar_id');
+        if (!$pelamarId) {
+            return redirect('/login/pelamar');
+        }
+
+        $pelamar = Pelamar::find($pelamarId);
+        if (!$pelamar) {
+            return redirect('/login/pelamar');
+        }
+
+        return view('keamanan', compact('pelamar'));
+    }
+
     public function updatePassword(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'password_lama' => 'required',
-            'password_baru' => 'required|min:8|confirmed',
+            'password_baru' => 'required|min:8|confirmed|different:password_lama',
+        ], [
+            'password_lama.required' => 'Password lama wajib diisi.',
+            'password_baru.required' => 'Password baru wajib diisi.',
+            'password_baru.min' => 'Password baru minimal harus 8 karakter.',
+            'password_baru.confirmed' => 'Konfirmasi password baru tidak cocok.',
+            'password_baru.different' => 'Password baru tidak boleh sama dengan password lama.',
         ]);
 
         if ($validator->fails()) {

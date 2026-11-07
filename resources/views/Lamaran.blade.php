@@ -338,6 +338,9 @@
                                 Selamat! Kamu diterima 🎉
                             @else
                                 Maaf, kamu belum lolos
+                                @if (!empty($lamaran->alasan_penolakan))
+                                    <span class="block mt-1 text-xs text-error font-medium">Catatan: {{ $lamaran->alasan_penolakan }}</span>
+                                @endif
                             @endif
                         </p>
 
