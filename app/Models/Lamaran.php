@@ -10,6 +10,7 @@ class Lamaran extends Model
         'pelamar_id',
         'lowongan_id',
         'status',
+        'alasan_penolakan',
         'cv_id',
         'portofolio_id',
         'popup_diterima_tampil',

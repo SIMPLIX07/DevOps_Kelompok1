@@ -141,6 +141,68 @@ class WawancaraController extends Controller
         return redirect()->back()->with('success', 'Undangan wawancara berhasil dikirim!');
     }
 
+    /**
+     * Reschedule / Ubah jadwal wawancara oleh perusahaan.
+     */
+    public function reschedule(Request $request, $id)
+    {
+        $perusahaanId = session('perusahaan_id');
+        if (!$perusahaanId) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized'], 401);
+            }
+            return redirect('/login/perusahaan');
+        }
+
+        $request->validate([
+            'tanggal'            => 'required|date',
+            'jam_mulai'          => 'required',
+            'jam_selesai'        => 'required|after:jam_mulai',
+            'link_meet'          => 'nullable|string',
+            'catatan_reschedule' => 'nullable|string|max:500',
+        ], [
+            'tanggal.required'     => 'Tanggal wawancara wajib diisi.',
+            'jam_mulai.required'   => 'Jam mulai wajib diisi.',
+            'jam_selesai.required' => 'Jam selesai wajib diisi.',
+            'jam_selesai.after'    => 'Jam selesai harus lebih akhir dari jam mulai.',
+        ]);
+
+        $wawancara = Wawancara::findOrFail($id);
+
+        // Otorisasi: Pastikan wawancara milik perusahaan yang sedang login
+        if ((int)$wawancara->perusahaan_id !== (int)$perusahaanId) {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Forbidden'], 403);
+            }
+            abort(403, 'Akses ditolak: Wawancara ini bukan milik perusahaan Anda.');
+        }
+
+        // Cek status wawancara
+        if ($wawancara->status === 'selesai') {
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Wawancara yang sudah selesai tidak dapat dijadwalkan ulang.'], 422);
+            }
+            return back()->withErrors(['status' => 'Wawancara yang sudah selesai tidak dapat dijadwalkan ulang.']);
+        }
+
+        $wawancara->update([
+            'tanggal'            => $request->tanggal,
+            'jam_mulai'          => $request->jam_mulai,
+            'jam_selesai'        => $request->jam_selesai,
+            'link_meet'          => $request->filled('link_meet') ? $request->link_meet : $wawancara->link_meet,
+            'catatan_reschedule' => $request->input('catatan_reschedule'),
+        ]);
+
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => 'Jadwal wawancara berhasil diubah',
+                'data'    => $wawancara,
+            ], 200);
+        }
+
+        return back()->with('success', 'Jadwal wawancara berhasil diperbarui.');
+    }
+
 
 
 

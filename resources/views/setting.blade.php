@@ -264,11 +264,11 @@
                         <span class="font-label-md text-label-md">Portofolio</span>
                     </a>
                     <!-- Keamanan -->
-                    <button type="button" id="btnKeamanan"
+                    <a href="{{ route('pelamar.keamanan') }}" id="btnKeamanan"
                         class="flex w-full items-center gap-sm px-md py-sm rounded-lg text-on-primary-container hover:bg-white/5 transition-all active:scale-95 text-left">
                         <span class="material-symbols-outlined">lock</span>
                         <span class="font-label-md text-label-md">Keamanan</span>
-                    </button>
+                    </a>
                 </nav>
 
                 {{-- Tombol bahaya di bawah, tetap ikut scroll --}}

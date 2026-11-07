@@ -236,9 +236,13 @@
                     data-posisi="{{ $wawancara->lowongan->posisi_pekerjaan }}"
                     data-nama="{{ $company }}"
                     data-tanggal="{{ \Carbon\Carbon::parse($wawancara->tanggal)->format('d M Y') }}"
+                    data-tanggal-raw="{{ $wawancara->tanggal }}"
                     data-jam="{{ $wawancara->jam_mulai }} - {{ $wawancara->jam_selesai }}"
+                    data-jam-mulai="{{ $wawancara->jam_mulai }}"
+                    data-jam-selesai="{{ $wawancara->jam_selesai }}"
                     data-pesan="{{ $wawancara->pesan ?? 'Tidak ada pesan khusus.' }}"
                     data-link="{{ $wawancara->link_meet }}"
+                    data-catatan-reschedule="{{ $wawancara->catatan_reschedule ?? '' }}"
                     data-status="{{ $uiStatus }}"
                     data-logo="{{ !empty($wawancara->pelamar?->foto_profil) ? asset('storage/' . $wawancara->pelamar->foto_profil) : '' }}">
                     Lihat Detail
@@ -325,17 +329,66 @@
                     </div>
                 </div>
 
-                <!-- Action buttons (Accept / Reject) -->
-                <div class="flex gap-4 w-full" id="modalActions">
-                    <button id="btnTerima" class="flex-1 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all active:scale-95 shadow-md">
+                <!-- Action buttons (Accept / Reschedule / Reject) -->
+                <div class="flex flex-col sm:flex-row gap-3 w-full" id="modalActions">
+                    <button id="btnTerima" class="flex-1 py-3 bg-secondary text-white font-bold rounded-xl hover:bg-opacity-90 transition-all active:scale-95 shadow-md text-xs sm:text-sm">
                         Terima Pelamar
                     </button>
-                    <button id="btnTolak" class="flex-1 py-3 bg-error text-white font-bold rounded-xl hover:bg-opacity-90 transition-all active:scale-95 shadow-md">
+                    <button id="btnReschedule" type="button" class="flex-1 py-3 bg-surface-container-high text-on-surface font-bold rounded-xl hover:bg-outline-variant/30 transition-all active:scale-95 shadow-md border border-outline-variant text-xs sm:text-sm">
+                        Ubah Jadwal
+                    </button>
+                    <button id="btnTolak" class="flex-1 py-3 bg-error text-white font-bold rounded-xl hover:bg-opacity-90 transition-all active:scale-95 shadow-md text-xs sm:text-sm">
                         Tolak Lamaran
                     </button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden backdrop-blur-sm" id="rescheduleModal">
+        <div class="glass-card p-6 rounded-2xl shadow-2xl max-w-md w-full mx-4 border border-outline-variant bg-white">
+            <div class="flex items-center justify-between pb-4 border-b border-outline-variant/30">
+                <h4 class="font-headline font-bold text-lg text-on-surface flex items-center gap-2">
+                    <span class="material-symbols-outlined text-secondary">calendar_clock</span>
+                    Ubah Jadwal Wawancara
+                </h4>
+                <button type="button" id="closeRescheduleModal" class="p-1 rounded-full hover:bg-surface-container text-on-surface-variant">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+            <form id="rescheduleForm" method="POST" action="" class="mt-4 space-y-4">
+                @csrf
+                @method('PUT')
+                <div>
+                    <label for="rescheduleTanggal" class="block text-xs font-semibold text-on-surface mb-1">Tanggal Wawancara Baru</label>
+                    <input type="date" id="rescheduleTanggal" name="tanggal" required class="w-full px-3 py-2 text-xs border border-outline-variant rounded-lg outline-none focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="rescheduleJamMulai" class="block text-xs font-semibold text-on-surface mb-1">Jam Mulai</label>
+                        <input type="time" id="rescheduleJamMulai" name="jam_mulai" required class="w-full px-3 py-2 text-xs border border-outline-variant rounded-lg outline-none focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+                    </div>
+                    <div>
+                        <label for="rescheduleJamSelesai" class="block text-xs font-semibold text-on-surface mb-1">Jam Selesai</label>
+                        <input type="time" id="rescheduleJamSelesai" name="jam_selesai" required class="w-full px-3 py-2 text-xs border border-outline-variant rounded-lg outline-none focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+                    </div>
+                </div>
+                <div>
+                    <label for="rescheduleLinkMeet" class="block text-xs font-semibold text-on-surface mb-1">Link Pertemuan (Opsional)</label>
+                    <input type="text" id="rescheduleLinkMeet" name="link_meet" placeholder="https://meet.google.com/..." class="w-full px-3 py-2 text-xs border border-outline-variant rounded-lg outline-none focus:ring-1 focus:ring-secondary bg-surface-container-lowest">
+                </div>
+                <div>
+                    <label for="rescheduleCatatan" class="block text-xs font-semibold text-on-surface mb-1">Catatan Perubahan (Opsional)</label>
+                    <textarea id="rescheduleCatatan" name="catatan_reschedule" rows="2" maxlength="500" placeholder="Alasan perubahan jadwal wawancara..." class="w-full px-3 py-2 text-xs border border-outline-variant rounded-lg outline-none focus:ring-1 focus:ring-secondary bg-surface-container-lowest"></textarea>
+                </div>
+                <div class="flex gap-3 pt-3 border-t border-outline-variant/30">
+                    <button type="button" id="cancelRescheduleBtn" class="flex-1 py-2.5 border border-outline-variant rounded-xl text-xs font-semibold text-on-surface-variant hover:bg-surface-container">Batal</button>
+                    <button type="submit" class="flex-1 py-2.5 bg-secondary text-white rounded-xl text-xs font-semibold hover:opacity-90 transition-all">Simpan Jadwal</button>
+                </div>
+            </form>
+        </div>
+    </div>
     </div>
 
     <!-- Confirmation popup -->
@@ -427,8 +480,11 @@
             const modal = document.getElementById('detailModal');
             const closeModal = document.getElementById('closeModal');
 
+            let activeInterviewBtn = null;
+
             document.querySelectorAll('.detail-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
+                    activeInterviewBtn = btn;
                     wawancaraId = btn.dataset.id;
                     const status = btn.dataset.status;
 
@@ -562,6 +618,36 @@
                 if (!wawancaraId) return;
                 openConfirmDialog('terima');
             });
+
+            // Tombol Reschedule
+            const rescheduleModal = document.getElementById('rescheduleModal');
+            const closeRescheduleModal = document.getElementById('closeRescheduleModal');
+            const cancelRescheduleBtn = document.getElementById('cancelRescheduleBtn');
+
+            document.getElementById('btnReschedule').addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (!wawancaraId || !activeInterviewBtn) return;
+
+                document.getElementById('rescheduleForm').action = `/perusahaan/wawancara/${wawancaraId}/reschedule`;
+                document.getElementById('rescheduleTanggal').value = activeInterviewBtn.dataset.tanggalRaw || '';
+                document.getElementById('rescheduleJamMulai').value = activeInterviewBtn.dataset.jamMulai || '';
+                document.getElementById('rescheduleJamSelesai').value = activeInterviewBtn.dataset.jamSelesai || '';
+                document.getElementById('rescheduleLinkMeet').value = activeInterviewBtn.dataset.link || '';
+                document.getElementById('rescheduleCatatan').value = activeInterviewBtn.dataset.catatanReschedule || '';
+
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                rescheduleModal.classList.remove('hidden');
+                rescheduleModal.classList.add('flex');
+            });
+
+            const hideRescheduleModal = () => {
+                rescheduleModal.classList.add('hidden');
+                rescheduleModal.classList.remove('flex');
+            };
+
+            if (closeRescheduleModal) closeRescheduleModal.addEventListener('click', hideRescheduleModal);
+            if (cancelRescheduleBtn) cancelRescheduleBtn.addEventListener('click', hideRescheduleModal);
 
             // Tombol Tolak
             document.getElementById('btnTolak').addEventListener('click', (e) => {
