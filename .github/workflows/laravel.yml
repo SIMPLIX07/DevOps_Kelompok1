@@ -1,0 +1,132 @@
+name: Laravel DevSecOps CI Pipeline
+
+on:
+  push:
+    branches: [ master, main ]
+  pull_request:
+    branches: [ master, main ]
+
+jobs:
+  # Build, Lint & Dependency Check
+  build-and-security:
+    name: "Stage 1: Build & Security Audit"
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, bcmath, zip
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Composer Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --prefer-dist
+
+      - name: Install NPM & Build Frontend Assets (Vite)
+        run: |
+          npm ci
+          npm run build
+
+      # Dependency Audit Check
+      - name: DevSecOps - PHP Dependency Check (Composer Audit)
+        run: composer audit --locked
+
+      - name: DevSecOps - Node.js Dependency Check (NPM Audit)
+        run: npm audit --audit-level=high || true
+
+  # Automated Testing & Code Coverage
+  testing:
+    name: "Stage 2: PHPUnit Testing & Coverage"
+    needs: build-and-security
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup PHP 8.2 & PCOV Coverage
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, xml, ctype, iconv, intl, pdo_sqlite, bcmath, zip
+          coverage: pcov
+
+      - name: Cache Composer Dependencies
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: ${{ runner.os }}-composer-
+
+      - name: Install Dependencies
+        run: composer install -q --no-ansi --no-interaction --no-scripts --prefer-dist
+
+      # Setup Laravel Test Environment
+      - name: Setup Laravel Test Environment
+        run: |
+          cp .env.example .env.testing
+          php artisan key:generate --env=testing
+
+      # Run PHPUnit and Generate Coverage Report
+      - name: Run Automated Tests (PHPUnit)
+        env:
+          DB_CONNECTION: sqlite
+          DB_DATABASE: ':memory:'
+        run: php artisan test --coverage-clover=coverage.xml
+
+      # Upload Coverage Report
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: coverage.xml
+          retention-days: 1
+
+  # Code Quality & SonarQube Analysis
+  code-quality:
+    name: "Stage 3: SonarQube Analysis"
+    needs: testing
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Download Coverage Report
+      - name: Download Coverage Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: code-coverage-report
+
+      # Run SonarQube Analysis
+      - name: SonarCloud / SonarQube Scanner
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.projectKey=SIMPLIX07_a
+            -Dsonar.organization=simplix07
+            -Dsonar.sources=app
+            -Dsonar.tests=tests
+            -Dsonar.php.coverage.reportPaths=coverage.xml
+            -Dsonar.exclusions=vendor/**,node_modules/**,storage/**,public/**
